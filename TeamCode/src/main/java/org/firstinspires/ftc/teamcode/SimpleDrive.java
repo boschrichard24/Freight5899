@@ -40,10 +40,10 @@ import com.qualcomm.robotcore.util.Range;
             // Initialize the hardware variables. Note that the strings used here as parameters
             // to 'get' must correspond to the names assigned during the robot configuration
             // step (using the FTC Robot Controller app on the phone).
-            left_Back_Drive  = hardwareMap.get(DcMotor.class, "left_Back_drive");
-            right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_drive");
-            left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_drive");
-            right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_drive");
+            left_Back_Drive  = hardwareMap.get(DcMotor.class, "left_Back_Drive");
+            right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
+            left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_Drive");
+            right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
 
             // Most robots need the motor on one side to be reversed to drive forward
             // Reverse the motor that runs backwards when connected directly to the battery
