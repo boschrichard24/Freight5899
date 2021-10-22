@@ -36,7 +36,7 @@ public class SimpleDrive extends LinearOpMode {
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
 
     // Define class members
-    Servo   servo;
+    Servo   ducky;
     double  position = 0; // Start at halfway position
 
     @Override
@@ -61,7 +61,7 @@ public class SimpleDrive extends LinearOpMode {
 
         // Connect to servo (Assume PushBot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        servo = hardwareMap.get(Servo.class, "left_hand");
+        ducky = hardwareMap.get(Servo.class, "ducky");
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to scan Servo." );
@@ -88,14 +88,14 @@ public class SimpleDrive extends LinearOpMode {
             double turn  =  gamepad1.right_stick_x;
 
             //ducky is input and ducky_run is the toggle
-            boolean ducky = gamepad1.right_bumper;
+            boolean ducky1 = gamepad1.right_bumper;
             boolean ducky_run = false;
 
             leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
             rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
             //Servo Move Func
-            if (ducky) {
+            if (ducky1) {
                 ducky_run = !ducky_run;
             }
             if (ducky_run) {
@@ -122,7 +122,7 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.update();
 
             // Set the servo to the new position and pause;
-            servo.setPosition(position);
+            ducky.setPosition(position);
         }
 
         // Signal done;
