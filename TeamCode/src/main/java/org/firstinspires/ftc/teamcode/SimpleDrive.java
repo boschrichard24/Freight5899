@@ -33,10 +33,10 @@ public class SimpleDrive extends LinearOpMode {
     private DcMotor right_Back_Drive = null;
     private DcMotor left_Front_Drive = null;
     private DcMotor right_Front_Drive = null;
-    static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
+    static final double INCREMENT  = 0.5;     // amount to slew servo each CYCLE_MS cycle
 
     // Define class members
-    Servo   ducky;
+    Servo   ducky = null;
     double  position = 0; // Start at halfway position
 
     @Override
@@ -95,10 +95,7 @@ public class SimpleDrive extends LinearOpMode {
             rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
             //Servo Move Func
-            if (ducky1) {
-                ducky_run = !ducky_run;
-            }
-            if (ducky_run) {
+            if (gamepad1.right_bumper) {
                 position += INCREMENT;
             }
 
@@ -112,6 +109,8 @@ public class SimpleDrive extends LinearOpMode {
             right_Back_Drive.setPower(rightPower);
             left_Front_Drive.setPower(leftPower);
             right_Front_Drive.setPower(rightPower);
+
+            telemetry.addData("Duck_On", ducky_run);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
