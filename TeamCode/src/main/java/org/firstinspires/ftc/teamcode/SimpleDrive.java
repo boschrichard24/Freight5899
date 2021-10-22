@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+
     /**
      * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
      * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -33,13 +34,10 @@ import com.qualcomm.robotcore.util.Range;
         private DcMotor left_Front_Drive = null;
         private DcMotor right_Front_Drive = null;
         static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
-        static final int    CYCLE_MS    =   50;     // period of each cycle
-        static final double MAX_POS     =  1.0;     // Maximum rotational position
-        static final double MIN_POS     =  0.0;     // Minimum rotational position
 
         // Define class members
         Servo   servo;
-        double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
+        double  position = 0; // Start at halfway position
 
         @Override
         public void runOpMode() {
@@ -79,6 +77,7 @@ import com.qualcomm.robotcore.util.Range;
                 // Setup a variable for each drive wheel to save power level for telemetry
                 double leftPower;
                 double rightPower;
+                double servoPower;
 
                 // Choose to drive using either Tank Mode, or POV Mode
                 // Comment out the method that's not used.  The default below is POV.
@@ -87,12 +86,17 @@ import com.qualcomm.robotcore.util.Range;
                 // - This uses basic math to combine motions and is easier to drive straight.
                 double drive = -gamepad1.left_stick_y;
                 double turn  =  gamepad1.right_stick_x;
+
+                //ducky is input and ducky_run is the toggle
                 boolean ducky = gamepad1.right_bumper;
+                boolean ducky_run = false;
+
                 leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
                 rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
-                while(ducky == true){
-                    
-                }
+
+                if (ducky) !ducky_run;
+
+                if (ducky_run) position += INCREMENT;
 
                 // Tank Mode uses one stick to control each wheel.
                 // - This requires no math, but it is hard to drive forward slowly and keep straight.
@@ -115,8 +119,6 @@ import com.qualcomm.robotcore.util.Range;
 
                 // Set the servo to the new position and pause;
                 servo.setPosition(position);
-                sleep(CYCLE_MS);
-                idle();
             }
 
             // Signal done;
