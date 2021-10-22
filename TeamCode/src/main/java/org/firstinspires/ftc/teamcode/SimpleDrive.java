@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -31,6 +32,14 @@ import com.qualcomm.robotcore.util.Range;
         private DcMotor right_Back_Drive = null;
         private DcMotor left_Front_Drive = null;
         private DcMotor right_Front_Drive = null;
+        static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
+        static final int    CYCLE_MS    =   50;     // period of each cycle
+        static final double MAX_POS     =  1.0;     // Maximum rotational position
+        static final double MIN_POS     =  0.0;     // Minimum rotational position
+
+        // Define class members
+        Servo   servo;
+        double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
 
         @Override
         public void runOpMode() {
@@ -52,6 +61,14 @@ import com.qualcomm.robotcore.util.Range;
             left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
             right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
 
+            // Connect to servo (Assume PushBot Left Hand)
+            // Change the text in quotes to match any servo name on your robot.
+            servo = hardwareMap.get(Servo.class, "left_hand");
+
+            // Wait for the start button
+            telemetry.addData(">", "Press Start to scan Servo." );
+            telemetry.update();
+
             // Wait for the game to start (driver presses PLAY)
             waitForStart();
             runtime.reset();
@@ -70,8 +87,12 @@ import com.qualcomm.robotcore.util.Range;
                 // - This uses basic math to combine motions and is easier to drive straight.
                 double drive = -gamepad1.left_stick_y;
                 double turn  =  gamepad1.right_stick_x;
-                leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-                rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+                boolean ducky = gamepad1.right_bumper;
+                leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
+                rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
+                while(ducky == true){
+                    
+                }
 
                 // Tank Mode uses one stick to control each wheel.
                 // - This requires no math, but it is hard to drive forward slowly and keep straight.
@@ -87,7 +108,19 @@ import com.qualcomm.robotcore.util.Range;
                 // Show the elapsed game time and wheel power.
                 telemetry.addData("Status", "Run Time: " + runtime.toString());
                 telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+                // Display the current value
+                telemetry.addData("Servo Position", "%5.2f", position);
+                telemetry.addData(">", "Press Stop to end test." );
                 telemetry.update();
+
+                // Set the servo to the new position and pause;
+                servo.setPosition(position);
+                sleep(CYCLE_MS);
+                idle();
             }
+
+            // Signal done;
+            telemetry.addData(">", "Done");
+            telemetry.update();
         }
     }
