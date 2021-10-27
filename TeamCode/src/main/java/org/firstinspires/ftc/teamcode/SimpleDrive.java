@@ -93,27 +93,22 @@ public class SimpleDrive extends LinearOpMode {
             double drive = -gamepad1.left_stick_y;
             double turn  =  gamepad1.right_stick_x;
 
-            //ducky is input and ducky_run is the toggle
-            boolean ducky_run = false;
+
 
             if (gamepad1.right_bumper) {
-                if (ducky_run) ducky_run = false;
-                else ducky_run = true;
+                ducky.setPower(2);
+            }
+            else{
+                ducky.setPower(0);
             }
 
 
             leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
             rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
-            servoPowerSet = 0.45;
+
 
             //Servo Move Func
-            if(ducky_run){
-                servoPower = 0.0;
-            }
-            else if(ducky_run == false){
-                servoPower = servoPowerSet;
-            }
 
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
