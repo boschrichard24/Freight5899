@@ -36,7 +36,7 @@ public class SimpleDrive extends LinearOpMode {
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
 
     // Define class members
-    Servo   servo;
+    CRServo   servo;
     double  position = 0; // Start at halfway position
 
     @Override
@@ -61,7 +61,7 @@ public class SimpleDrive extends LinearOpMode {
 
         // Connect to servo (Assume PushBot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        servo = hardwareMap.get(Servo.class, "left_hand");
+        servo = hardwareMap.get(CRServo.class, "left_hand");
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to scan Servo." );
@@ -75,8 +75,14 @@ public class SimpleDrive extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Setup a variable for each drive wheel to save power level for telemetry
+            /*
+            left power and right power is the power for the dc drive motors.
+            servoPowerSet is the speed of the servo (to be adjusted)
+            and servoPower is the actual value to change.
+             */
             double leftPower;
             double rightPower;
+            double servoPowerSet;
             double servoPower;
 
             // Choose to drive using either Tank Mode, or POV Mode
@@ -94,12 +100,17 @@ public class SimpleDrive extends LinearOpMode {
             leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
             rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
+            servoPowerSet = 0.45;
+
             //Servo Move Func
             if (ducky) {
                 ducky_run = !ducky_run;
             }
             if (ducky_run) {
-                position += INCREMENT;
+                servoPower = servoPowerSet;
+            }
+            else {
+                servoPower = 0;
             }
 
             // Tank Mode uses one stick to control each wheel.
@@ -117,12 +128,12 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
             // Display the current value
-            telemetry.addData("Servo Position", "%5.2f", position);
+            telemetry.addData("Servo Power", "%5.2f", servoPower);
             telemetry.addData(">", "Press Stop to end test." );
             telemetry.update();
 
             // Set the servo to the new position and pause;
-            servo.setPosition(position);
+            servo.setPower(servoPower);
         }
 
         // Signal done;
