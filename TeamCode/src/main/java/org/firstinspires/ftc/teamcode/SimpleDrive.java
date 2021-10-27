@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -51,6 +52,7 @@ public class SimpleDrive extends LinearOpMode {
         right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
         left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_Drive");
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
+        ducky = hardwareMap.get(CRServo.class, "ducky");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -58,10 +60,11 @@ public class SimpleDrive extends LinearOpMode {
         right_Back_Drive.setDirection(DcMotor.Direction.REVERSE); //hherhigrgeg
         left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Connect to servo (Assume PushBot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        ducky = hardwareMap.get(CRServo.class, "ducky");
+
 
         // Wait for the start button
         telemetry.addData(">", "Press Start to scan Servo." );
@@ -83,37 +86,32 @@ public class SimpleDrive extends LinearOpMode {
             double leftPower;
             double rightPower;
             double servoPowerSet = 0;
-            double servoPower = 0;
+            double servoPower = 2;
 
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
+            //double drive = -gamepad1.left_stick_y;
+            //double turn  =  gamepad1.right_stick_x; srfvfvfvfhfbfuiouob
 
-
+            //leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
+            //rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
             if (gamepad1.right_bumper) {
-                ducky.setPower(2);
+                ducky.setPower(servoPower);
             }
             else{
                 ducky.setPower(0);
             }
 
-
-            leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
-            rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
-
-
-
             //Servo Move Func
 
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+            leftPower  = -gamepad1.left_stick_y ;
+            rightPower = -gamepad1.right_stick_y ;
 
             // Send calculated power to wheels
             left_Back_Drive.setPower(leftPower);
@@ -129,8 +127,7 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.addData(">", "Press Stop to end test." );
             telemetry.update();
 
-            // Set the servo to the new position and pause;
-            ducky.setPower(servoPower);
+
         }
 
         // Signal done;
