@@ -94,14 +94,7 @@ public class SimpleDrive extends LinearOpMode {
 
             if (gamepad1.right_bumper) {
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                for (int i = 0;i <=22;i++) {
-                    if (i >= 13) {
-                        ducky.setPower(0.5);
-                    }
-                    else {
-                        ducky.setPower(2.5);
-                    }
-                }
+                ducky.setPower(2.5);
             }
             else{
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
