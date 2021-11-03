@@ -91,10 +91,14 @@ public class SimpleDrive extends LinearOpMode {
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
-
+            ducky.setDirection(DcMotorSimple.Direction.FORWARD);
             if (gamepad1.right_bumper) {
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                ducky.setPower(2.5);
+                ducky.setPower(1);
+            }
+            if (gamepad1.left_bumper) {
+                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+                ducky.setPower(3);
             }
             else{
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
