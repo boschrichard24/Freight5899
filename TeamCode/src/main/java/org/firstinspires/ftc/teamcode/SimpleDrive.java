@@ -118,10 +118,14 @@ public class SimpleDrive extends LinearOpMode {
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
 
             if (gamepad1.y) {
-                timesPressed ++;
+                if (yHasBeenPressed = false) timesPressed ++;
+                yHasBeenPressed = true;
+            }
+            else {
+                yHasBeenPressed = false;
             }
 
-            if (gamepad.b) {
+            if (gamepad1.b) {
                 timeHeld ++;
             }
             else {
@@ -157,7 +161,7 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.addData("y-button (times pressed) || ", timesPressed);
             telemetry.addData("b-button (increase on hold) || ", timeHeld);
             telemetry.addData("a-button (toggle switch) || ", toggle);
-            telemetry.addData("x-button (option sifter) || " option);
+            telemetry.addData("x-button (option sifter) || ", option);
             telemetry.update();
 
             // --={####     UNCOMMENT THIS CODE!!!   ####}=-- \\
