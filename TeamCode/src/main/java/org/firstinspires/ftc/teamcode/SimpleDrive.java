@@ -62,8 +62,17 @@ public class SimpleDrive extends LinearOpMode {
         // Change the text in quotes to match any servo name on your robot.
         ducky = hardwareMap.get(CRServo.class, "ducky");
 
+        // THESE ARE FOR TELEMETRY TESTING \\
+        int timesPressed = 0;
+        double timeHeld = 0;
+        boolean toggle = false;
+        int optionSiftIndex = 0;
+        String option = "";
+        boolean yHasBeenPressed = false;
+        boolean aHasBeenPressed = false;
+
         // Wait for the start button
-        telemetry.addData(">", "Press Start to scan Servo." );
+        telemetry.addData(">", "Ready to run program." );
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
@@ -83,7 +92,7 @@ public class SimpleDrive extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-           // double drive = -gamepad1.left_stick_y;
+            // double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
 
             //leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
@@ -91,18 +100,14 @@ public class SimpleDrive extends LinearOpMode {
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
-            ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
             if (gamepad1.right_bumper) {
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                ducky.setPower(1);
-            }
-            if (gamepad1.left_bumper) {
-                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                ducky.setPower(3);
+                //ducky.setPower(2.5);
             }
             else{
                 ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                ducky.setPower(0);
+                //ducky.setPower(0);
             }
 
             // Tank Mode uses one stick to control each wheel.
@@ -110,20 +115,72 @@ public class SimpleDrive extends LinearOpMode {
             leftPower  = -gamepad1.left_stick_y ;
             rightPower = -gamepad1.right_stick_y ;
 
-            // Send calculated power to wheels
-            left_Back_Drive.setPower(leftPower);
-            right_Back_Drive.setPower(rightPower);
-            left_Front_Drive.setPower(leftPower);
-            right_Front_Drive.setPower(rightPower);
+            // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
 
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            // Display the current value
-            telemetry.addData("Servo Position", "%5.2f", position);
-            telemetry.addData(">", "Press Stop to end test." );
+            if (gamepad1.y) {
+                if (yHasBeenPressed = false) timesPressed ++;
+                yHasBeenPressed = true;
+            }
+            else {
+                yHasBeenPressed = false;
+            }
+
+            if (gamepad.b) {
+                timeHeld ++;
+            }
+            else {
+                timeHeld = 0;
+            }
+
+            if (gamepad1.a) {
+                toggle = !toggle;
+            }
+
+            if (gamepad!.x) {
+                optionSiftIndex ++;
+                if (optionSiftIndex > 3) optionSiftIndex = 1;
+                //if (optionSiftIndex == 1) option = "Option 1";
+                //if (optionSiftIndex == 2) option = "Option 2";
+                //if (optionSiftIndex == 3) option = "Option 3";
+                switch (optionSiftIndex) {
+                    case 1:
+                        option = "Option 1";
+                        break;
+                    case 2:
+                        option = "Option 2";
+                        break;
+                    case 3:
+                        option = "Option 3";
+                        break;
+                    default:
+                        option = "Somethings wrong :(";
+                        break;
+                }
+            }
+
+            telemetry.addData("y-button (times pressed) || ", timesPressed);
+            telemetry.addData("b-button (increase on hold) || ", timeHeld);
+            telemetry.addData("a-button (toggle switch) || ", toggle);
+            telemetry.addData("x-button (option sifter) || " option);
             telemetry.update();
 
+            // --={####     UNCOMMENT THIS CODE!!!   ####}=-- \\
+            // uncomment lines 97 and 101 too \\
+
+            // Send calculated power to wheels
+            //left_Back_Drive.setPower(leftPower);
+            //right_Back_Drive.setPower(rightPower);
+            //left_Front_Drive.setPower(leftPower);
+            //right_Front_Drive.setPower(rightPower);
+
+            // Show the elapsed game time and wheel power.
+            /* telemetry.addData("Status", "Run Time: " + runtime.toString());
+             * telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+             * // Display the current value
+             * telemetry.addData("Servo Position", "%5.2f", position);
+             * telemetry.addData(">", "Press Stop to end test." );
+             * telemetry.update();
+             */
         }
 
         // Signal done;
