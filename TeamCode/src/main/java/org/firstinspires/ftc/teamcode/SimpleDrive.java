@@ -118,11 +118,7 @@ public class SimpleDrive extends LinearOpMode {
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
 
             if (gamepad1.y) {
-                if (yHasBeenPressed = false) timesPressed ++;
-                yHasBeenPressed = true;
-            }
-            else {
-                yHasBeenPressed = false;
+                timesPressed ++;
             }
 
             if (gamepad.b) {
@@ -136,7 +132,7 @@ public class SimpleDrive extends LinearOpMode {
                 toggle = !toggle;
             }
 
-            if (gamepad!.x) {
+            if (gamepad1.x) {
                 optionSiftIndex ++;
                 if (optionSiftIndex > 3) optionSiftIndex = 1;
                 //if (optionSiftIndex == 1) option = "Option 1";
