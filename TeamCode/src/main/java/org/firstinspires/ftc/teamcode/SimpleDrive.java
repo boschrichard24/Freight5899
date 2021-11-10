@@ -96,8 +96,8 @@ public class SimpleDrive extends LinearOpMode {
             // double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
 
-            leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
-            rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
+            leftPower = Range.clip(drive + turn, -2.0, 2.0);
+            rightPower = Range.clip(drive - turn, -2.0, 2.0);
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
