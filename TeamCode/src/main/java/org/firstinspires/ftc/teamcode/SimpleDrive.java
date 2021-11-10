@@ -35,8 +35,7 @@ public class SimpleDrive extends LinearOpMode {
     private DcMotor right_Front_Drive = null;
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
     // Define class members
-    CRServo   ducky;
-    double  position = 0; // Start at halfway position
+    private DcMotor ducky = null;
 
     @Override
     public void runOpMode() {
@@ -60,7 +59,9 @@ public class SimpleDrive extends LinearOpMode {
 
         // Connect to servo (Assume PushBot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        ducky = hardwareMap.get(CRServo.class, "ducky");
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // THESE ARE FOR TELEMETRY TESTING \\
         int timesPressed = 0;
@@ -95,18 +96,16 @@ public class SimpleDrive extends LinearOpMode {
             // double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
 
-            //leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
-            //rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
+            leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
+            rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
 
             if (gamepad1.right_bumper) {
-                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                //ducky.setPower(2.5);
+                ducky.setPower(2.5);
             }
             else{
-                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
                 //ducky.setPower(0);
             }
 
@@ -116,7 +115,7 @@ public class SimpleDrive extends LinearOpMode {
             rightPower = -gamepad1.right_stick_y ;
 
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
-
+            /*
             if (gamepad1.y) {
                 if (yHasBeenPressed = false) timesPressed ++;
                 yHasBeenPressed = true;
@@ -139,9 +138,6 @@ public class SimpleDrive extends LinearOpMode {
             if (gamepad1.x) {
                 optionSiftIndex ++;
                 if (optionSiftIndex > 3) optionSiftIndex = 1;
-                //if (optionSiftIndex == 1) option = "Option 1";
-                //if (optionSiftIndex == 2) option = "Option 2";
-                //if (optionSiftIndex == 3) option = "Option 3";
                 switch (optionSiftIndex) {
                     case 1:
                         option = "Option 1";
@@ -164,14 +160,14 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.addData("x-button (option sifter) || ", option);
             telemetry.update();
 
-            // --={####     UNCOMMENT THIS CODE!!!   ####}=-- \\
-            // uncomment lines 97 and 101 too \\
+
+             */
 
             // Send calculated power to wheels
-            //left_Back_Drive.setPower(leftPower);
-            //right_Back_Drive.setPower(rightPower);
-            //left_Front_Drive.setPower(leftPower);
-            //right_Front_Drive.setPower(rightPower);
+            left_Back_Drive.setPower(leftPower);
+            right_Back_Drive.setPower(rightPower);
+            left_Front_Drive.setPower(leftPower);
+            right_Front_Drive.setPower(rightPower);
 
             // Show the elapsed game time and wheel power.
             /* telemetry.addData("Status", "Run Time: " + runtime.toString());
