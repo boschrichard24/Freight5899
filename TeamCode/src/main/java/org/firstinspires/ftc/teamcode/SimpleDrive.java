@@ -106,7 +106,7 @@ public class SimpleDrive extends LinearOpMode {
                 ducky.setPower(2.5);
             }
             else{
-                //ducky.setPower(0);
+                ducky.setPower(0);
             }
 
             // Tank Mode uses one stick to control each wheel.
