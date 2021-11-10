@@ -8,7 +8,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.hardware.Servo;
 
 
 /**
@@ -34,19 +33,9 @@ public class SimpleDrive extends LinearOpMode {
     private DcMotor right_Back_Drive = null;
     private DcMotor left_Front_Drive = null;
     private DcMotor right_Front_Drive = null;
-    // amount to slew servo each CYCLE_MS cycle
-    // Define class members
-    CRServo   ducky;
-
     static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
-    static final int    CYCLE_MS    =   50;     // period of each cycle
-    static final double MAX_POS     =  1.0;     // Maximum rotational position
-    static final double MIN_POS     =  0.0;     // Minimum rotational position
-
     // Define class members
-    Servo   servo;
-    double  position = (MAX_POS - MIN_POS) / 2; // Start at halfway position
-    boolean rampUp = true;
+    private DcMotor ducky = null;
 
     @Override
     public void runOpMode() {
@@ -70,7 +59,9 @@ public class SimpleDrive extends LinearOpMode {
 
         // Connect to servo (Assume PushBot Left Hand)
         // Change the text in quotes to match any servo name on your robot.
-        ducky = hardwareMap.get(CRServo.class, "ducky");
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // THESE ARE FOR TELEMETRY TESTING \\
         int timesPressed = 0;
@@ -92,49 +83,6 @@ public class SimpleDrive extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Connect to servo (Assume PushBot Left Hand)
-            // Change the text in quotes to match any servo name on your robot.
-            servo = hardwareMap.get(Servo.class, "hand");
-
-            // Wait for the start button
-            telemetry.addData(">", "Press Start to scan Servo." );
-            telemetry.update();
-            waitForStart();
-
-
-            // Scan servo till stop pressed.
-            while(opModeIsActive()){
-
-                // slew the servo, according to the rampUp (direction) variable.
-                if(gamepad1.x) {
-                    if (rampUp) {
-                        // Keep stepping up until we hit the max value.
-                        position += INCREMENT;
-                        if (position >= MAX_POS) {
-                            position = MAX_POS;
-                            rampUp = !rampUp;   // Switch ramp direction
-                        }
-                    } else {
-                        // Keep stepping down until we hit the min value.
-                        position -= INCREMENT;
-                        if (position <= MIN_POS) {
-                            position = MIN_POS;
-                            rampUp = !rampUp;  // Switch ramp direction
-                        }
-                    }
-                }
-
-                // Display the current value
-                telemetry.addData("Servo Position", "%5.2f", position);
-                telemetry.addData(">", "Press Stop to end test." );
-                telemetry.update();
-
-                // Set the servo to the new position and pause;
-                servo.setPosition(position);
-                sleep(CYCLE_MS);
-                idle();
-            }
-
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
             double rightPower;
@@ -148,19 +96,17 @@ public class SimpleDrive extends LinearOpMode {
             // double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
 
-            //leftPower    = Range.clip(drive + turn, -2.0, 2.0) ;
-            //rightPower   = Range.clip(drive - turn, -2.0, 2.0) ;
+            leftPower = Range.clip(drive + turn, -2.0, 2.0);
+            rightPower = Range.clip(drive - turn, -2.0, 2.0);
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
 
             if (gamepad1.right_bumper) {
-                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                //ducky.setPower(2.5);
+                ducky.setPower(2.5);
             }
             else{
-                ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-                //ducky.setPower(0);
+                ducky.setPower(0);
             }
 
             // Tank Mode uses one stick to control each wheel.
@@ -169,7 +115,7 @@ public class SimpleDrive extends LinearOpMode {
             rightPower = -gamepad1.right_stick_y ;
 
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
-
+            /*
             if (gamepad1.y) {
                 if (yHasBeenPressed = false) timesPressed ++;
                 yHasBeenPressed = true;
@@ -217,14 +163,14 @@ public class SimpleDrive extends LinearOpMode {
             telemetry.addData("x-button (option sifter) || ", option);
             telemetry.update();
 
-            // --={####     UNCOMMENT THIS CODE!!!   ####}=-- \\
-            // uncomment lines 97 and 101 too \\
+
+             */
 
             // Send calculated power to wheels
-            //left_Back_Drive.setPower(leftPower);
-            //right_Back_Drive.setPower(rightPower);
-            //left_Front_Drive.setPower(leftPower);
-            //right_Front_Drive.setPower(rightPower);
+            left_Back_Drive.setPower(leftPower);
+            right_Back_Drive.setPower(rightPower);
+            left_Front_Drive.setPower(leftPower);
+            right_Front_Drive.setPower(rightPower);
 
             // Show the elapsed game time and wheel power.
             /* telemetry.addData("Status", "Run Time: " + runtime.toString());
