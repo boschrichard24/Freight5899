@@ -93,11 +93,11 @@ public class SimpleDrive extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            // double drive = -gamepad1.left_stick_y;
+            //double drive = -gamepad1.left_stick_y;
             //double turn  =  gamepad1.right_stick_x;
 
-            leftPower = Range.clip(drive + turn, -2.0, 2.0);
-            rightPower = Range.clip(drive - turn, -2.0, 2.0);
+            //leftPower = Range.clip(drive + turn, -2.0, 2.0);
+            //  arightPower = Range.clip(drive - turn, -2.0, 2.0);
 
             //Servo Move Func
             //ducky is input and ducky_run is the toggle
