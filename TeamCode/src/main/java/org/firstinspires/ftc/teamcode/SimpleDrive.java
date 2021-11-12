@@ -115,6 +115,8 @@ public class SimpleDrive extends LinearOpMode {
             rightPower = -gamepad1.right_stick_y ;
 
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
+
+
             /*
             if (gamepad1.y) {
                 if (yHasBeenPressed = false) timesPressed ++;
@@ -181,8 +183,9 @@ public class SimpleDrive extends LinearOpMode {
              * telemetry.update();
              */
         }
-
+        float jeff = gamepad1.right_trigger;
         // Signal done;
+        telemetry.addData("Trigger_Value", jeff);
         telemetry.addData(">", "Done");
         telemetry.update();
     }
