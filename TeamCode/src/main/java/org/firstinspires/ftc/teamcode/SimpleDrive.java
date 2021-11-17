@@ -184,9 +184,9 @@ public class SimpleDrive extends LinearOpMode {
              * telemetry.update();
              */
         }
-        float jeff = gamepad1.right_trigger;
+        float triggerValue = gamepad1.right_trigger;
         // Signal done;
-        telemetry.addData("Trigger_Value", jeff);
+        telemetry.addData("Trigger_Value", triggerValue);
         telemetry.addData(">", "Done");
         telemetry.update();
     }
