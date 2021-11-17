@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
@@ -26,16 +25,19 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="SimpleDrive", group="Linear Opmode")
 //@Disabled
+
 public class SimpleDrive extends LinearOpMode {
 
-    // Declare OpMode members.
+    // Variable for time elapsed \\
     private ElapsedTime runtime = new ElapsedTime();
+
+    // Four main drive motors \\
     private DcMotor left_Back_Drive = null;
     private DcMotor right_Back_Drive = null;
     private DcMotor left_Front_Drive = null;
     private DcMotor right_Front_Drive = null;
-    static final double INCREMENT   = 0.01;     // amount to slew servo each CYCLE_MS cycle
-    // Define class members
+
+    // Carousel motor for ducks \\
     private DcMotor ducky = null;
 
     @Override
@@ -51,20 +53,23 @@ public class SimpleDrive extends LinearOpMode {
         left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_Drive");
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
 
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+
+        // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
-        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE); //hherhigrgeg
+        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
         left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
-
-        // Connect to servo (Assume PushBot Left Hand)
-        // Change the text in quotes to match any servo name on your robot.
-        ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // THESE ARE FOR TELEMETRY TESTING \\
+        /* I used these to test different types of input for the controller.
+        * The X, B, Y, and A buttons are used to test stuff like a button toggle,
+        * a button hold, a counter, and an option sifter (press a button to sift
+        * through a list of options). It displays info on the phone, but it's commented out.
+        */
+
         int timesPressed = 0;
         double timeHeld = 0;
         boolean toggle = false;
@@ -72,6 +77,8 @@ public class SimpleDrive extends LinearOpMode {
         String option = "";
         boolean yHasBeenPressed = false;
         boolean aHasBeenPressed = false;
+
+        float triggerValue = 0.0f;
 
         // Wait for the start button
         telemetry.addData(">", "Ready to run program." );
@@ -89,6 +96,8 @@ public class SimpleDrive extends LinearOpMode {
             double rightPower;
             double servoPower;
 
+            triggerValue = gamepad1.right_trigger;
+
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -98,11 +107,10 @@ public class SimpleDrive extends LinearOpMode {
             //double turn  =  gamepad1.right_stick_x;
 
             //leftPower = Range.clip(drive + turn, -2.0, 2.0);
-            //  arightPower = Range.clip(drive - turn, -2.0, 2.0);
+            //rightPower = Range.clip(drive - turn, -2.0, 2.0);
 
-            //Servo Move Func
-            //ducky is input and ducky_run is the toggle
-
+            //Servo Move Func \\
+            //ducky is input and ducky_run is the toggle \\
             if (gamepad1.right_bumper) {
                 ducky.setPower(2.5);
             }
@@ -116,8 +124,6 @@ public class SimpleDrive extends LinearOpMode {
             rightPower = -gamepad1.right_stick_y ;
 
             // --={####     THIS CODE IS FOR TELEMETRY TESTS    ####}=-- \\
-
-
             /*
             if (gamepad1.y) {
                 if (yHasBeenPressed = false) timesPressed ++;
@@ -178,13 +184,12 @@ public class SimpleDrive extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             /* telemetry.addData("Status", "Run Time: " + runtime.toString());
              * telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-             * // Display the current value
-             * telemetry.addData("Servo Position", "%5.2f", position);
+             * Display the current value
              * telemetry.addData(">", "Press Stop to end test." );
              * telemetry.update();
              */
         }
-        float triggerValue = gamepad1.right_trigger;
+
         // Signal done;
         telemetry.addData("Trigger_Value", triggerValue);
         telemetry.addData(">", "Done");
