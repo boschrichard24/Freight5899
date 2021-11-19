@@ -1,3 +1,103 @@
+package org.firstinspires.ftc.teamcode;
+
+//imports
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+
+//import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
+//import org.openftc.easyopencv.OpenCvCamera;
+//import org.openftc.easyopencv.OpenCvCameraRotation;
+//import org.openftc.easyopencv.OpenCvInternalCamera;
+//import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
+//import org.openftc.easyopencv.OpenCvCamera;
+//import org.openftc.easyopencv.OpenCvCameraRotation;
+//import org.openftc.easyopencv.OpenCvInternalCamera;
+
+
+public abstract class AutoSupplies extends LinearOpMode{
+
+
+    //  Declare OpMode Members
+    protected ElapsedTime runtime = new ElapsedTime();
+    abstract public void runOpMode() throws InterruptedException;
+
+    //---callable methods---\\
+
+    //move
+    public void move(long millis, double x, double y)
+    {
+        double fwdBackPower = y;
+        double strafePower = x;
+        double leftFrontPower = fwdBackPower + strafePower;
+        double rightFrontPower = fwdBackPower - strafePower;
+        double leftBackPower = fwdBackPower - strafePower;
+        double rightBackPower = fwdBackPower + strafePower;
+        double maxPower;
+        double max = 1.0;
+
+        maxPower = Math.abs(leftFrontPower);
+        if (Math.abs(rightFrontPower) > maxPower) {
+            maxPower = Math.abs(rightFrontPower);
+        }
+        if (Math.abs(leftBackPower) > maxPower) {
+            maxPower = Math.abs(leftBackPower);
+        }
+        if (Math.abs(rightBackPower) > maxPower) {
+            maxPower = Math.abs(rightBackPower);
+        }
+        if (maxPower > 1) {
+            leftFrontPower = leftFrontPower / maxPower;
+            rightFrontPower = rightFrontPower / maxPower;
+            leftBackPower = leftBackPower / maxPower;
+            rightBackPower = rightBackPower / maxPower;
+
+        }
+        //sets the power of the motors
+        runtime.reset();
+        while (opModeIsActive() && runtime.milliseconds() <= millis) {
+            motorFwdLeft.setPower(leftFrontPower*max);
+            motorFwdRight.setPower(rightFrontPower*max);
+            motorBackLeft.setPower(leftBackPower*max);
+            motorBackRight.setPower(rightBackPower*max);
+        }
+        motorFwdLeft.setPower(0);
+        motorFwdRight.setPower(0);
+        motorBackLeft.setPower(0);
+        motorBackRight.setPower(0);
+    }
+    public void setPower(double x, double y)
+    {
+        double fwdBackPower = y;
+        double strafePower = x;
+        double leftFrontPower = fwdBackPower + strafePower;
+        double rightFrontPower = fwdBackPower - strafePower;
+        double leftBackPower = fwdBackPower - strafePower;
+        double rightBackPower = fwdBackPower + strafePower;
+
+        motorFwdLeft.setPower(leftFrontPower);
+        motorFwdRight.setPower(rightFrontPower);
+        motorBackLeft.setPower(leftBackPower);
+        motorBackRight.setPower(rightBackPower);
+    }
+
+    public void initForAutonomous()
+    {
+
+    }
+}
+
+
+
 //  -=={###    OLD AUTOSUPPLIES FOR REFERENCE    ###}==-  \\
 /*package org.firstinspires.ftc.teamcode;
 
