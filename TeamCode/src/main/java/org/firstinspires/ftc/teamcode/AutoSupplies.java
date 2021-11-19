@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode;
+//  -=={###    OLD AUTOSUPPLIES FOR REFERENCE    ###}==-  \\
+/*package org.firstinspires.ftc.teamcode;
 
 //imports
 
@@ -266,10 +267,10 @@ public abstract class AutoSupplies extends LinearOpMode{
         globalPitch = 0;
     }
 
-    /**
-     * Get current cumulative angle rotation from last reset.
-     * @return Angle in degrees. + = left, - = right.
-     */
+    //
+    // * Get current cumulative angle rotation from last reset.
+    // * @return Angle in degrees. + = left, - = right.
+    // *
 
 
     //uses the imu to find the current angle
@@ -368,3 +369,4 @@ public abstract class AutoSupplies extends LinearOpMode{
         telemetry.update();
     }
 }
+*/
