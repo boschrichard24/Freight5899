@@ -28,6 +28,13 @@ import com.qualcomm.robotcore.util.Range;
 
 public class SimpleDrive extends LinearOpMode {
 
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor left_Back_Drive = null;
+    private DcMotor right_Back_Drive = null;
+    private DcMotor left_Front_Drive = null;
+    private DcMotor right_Front_Drive = null;
+    private DcMotor ducky = null;
+    
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
