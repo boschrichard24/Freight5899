@@ -35,7 +35,7 @@ public class SimpleDrive extends LinearOpMode {
     private DcMotor right_Front_Drive = null;
     private DcMotor left_Arm_Motor = null;
     private DcMotor right_Arm_Motor = null;
-    private DcMotor ducky = null;
+    //private DcMotor ducky = null;
 
     @Override
     public void runOpMode() {
@@ -52,14 +52,14 @@ public class SimpleDrive extends LinearOpMode {
         left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
 
-        ducky = hardwareMap.get(DcMotor.class, "ducky");
+       // ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
         left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
-        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+        //ducky.setDirection(DcMotorSimple.Direction.FORWARD);
         right_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         left_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
 
@@ -113,13 +113,13 @@ public class SimpleDrive extends LinearOpMode {
 
             //Servo Move Func \\
             //ducky is input and ducky_run is the toggle \\
-            if (gamepad1.right_bumper) {
+            /*if (gamepad1.right_bumper) {
                 ducky.setPower(2.5);
             }
             else{
                 ducky.setPower(0);
             }
-
+*/
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
 
