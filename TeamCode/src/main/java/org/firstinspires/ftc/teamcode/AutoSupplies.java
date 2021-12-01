@@ -16,6 +16,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public abstract class AutoSupplies extends LinearOpMode{
+    // Motors, servos, etc.
+    private DcMotor left_Back_Drive = null;
+    private DcMotor right_Back_Drive = null;
+    private DcMotor left_Front_Drive = null;
+    private DcMotor right_Front_Drive = null;
+    private DcMotor left_Arm_Motor = null;
+    private DcMotor right_Arm_Motor = null;
+    private Servo claw_Servo = null;
+
+    // For the claw servo \\
+    double newPosition;
 
     //  Declare OpMode Members
     protected ElapsedTime runtime = new ElapsedTime();
@@ -48,6 +59,17 @@ public abstract class AutoSupplies extends LinearOpMode{
         //motorFwdRight.setPower(rightFrontPower);
         //motorBackLeft.setPower(leftBackPower);
         //motorBackRight.setPower(rightBackPower);
+    }
+
+    public void toggleClaw(double increment, double maxAngle, double minAngle, boolean open)
+    {
+        if (open && newPosition < max) {
+            newPosition += increment;
+        }
+        else if (!open && newPosition > min) {
+            newPosition -= increment;
+        }
+        claw_Servo.setPosition(newPosition);
     }
 
     public void initForAutonomous()
