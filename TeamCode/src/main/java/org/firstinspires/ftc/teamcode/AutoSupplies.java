@@ -63,10 +63,10 @@ public abstract class AutoSupplies extends LinearOpMode{
 
     public void toggleClaw(double increment, double maxAngle, double minAngle, boolean open)
     {
-        if (open && newPosition < max) {
+        if (open && newPosition < maxAngle) {
             newPosition += increment;
         }
-        else if (!open && newPosition > min) {
+        else if (!open && newPosition > minAngle) {
             newPosition -= increment;
         }
         claw_Servo.setPosition(newPosition);
