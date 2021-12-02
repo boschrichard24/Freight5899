@@ -76,6 +76,11 @@ public abstract class AutoSupplies extends LinearOpMode{
     {
 
     }
+
+    public void test()
+    {
+        telemetry.addData("Test: ", "Comp.TeleOp is communicating with A.Supplies");
+    }
 }
 
 
