@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -46,7 +47,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
         left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
-        claw = hardwareMap.get(Servo.class, "claw");
+        claw_Servo = hardwareMap.get(Servo.class, "claw");
         // ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         // Set the direction for each of the motors \\
@@ -68,7 +69,7 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         }
     }
-    public void setPower(double leftPower, double, rightPower)
+    public void setPower(double leftPower, double rightPower)
     {
         left_Front_Drive.setPower(leftPower);
         left_Back_Drive.setPower(leftPower);
