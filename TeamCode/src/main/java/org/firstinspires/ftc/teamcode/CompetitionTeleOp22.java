@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 @TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
 
-public class CompetitionTeleOp22 {
-
+public class CompetitionTeleOp22 extends AutoSupplies {
 
 
     @Override
@@ -15,7 +17,7 @@ public class CompetitionTeleOp22 {
         runtime.reset();
 
         while (opModeIsActive()){
-            autoSupplies.test();
+            AutoSupplies.test();
         }
     }
 }
