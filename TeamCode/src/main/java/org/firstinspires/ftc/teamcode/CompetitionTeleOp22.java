@@ -16,8 +16,11 @@ public class CompetitionTeleOp22 extends AutoSupplies {
         waitForStart();
         runtime.reset();
 
+        AutoSupplies.setup();
+
         while (opModeIsActive()){
-            AutoSupplies.test();
+            //AutoSupplies.test();
+
         }
     }
 }
