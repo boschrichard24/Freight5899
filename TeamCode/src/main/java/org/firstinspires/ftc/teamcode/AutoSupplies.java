@@ -92,7 +92,7 @@ public abstract class AutoSupplies extends LinearOpMode{
 
     }
 
-    public static void test()
+    public void test()
     {
         //telemetry.update();
     }

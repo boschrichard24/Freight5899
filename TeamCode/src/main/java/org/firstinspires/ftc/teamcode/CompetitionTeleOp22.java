@@ -19,7 +19,7 @@ public class CompetitionTeleOp22 extends AutoSupplies {
         //AutoSupplies.setup();
 
         while (opModeIsActive()){
-            AutoSupplies.test();
+            move();
 
         }
     }
