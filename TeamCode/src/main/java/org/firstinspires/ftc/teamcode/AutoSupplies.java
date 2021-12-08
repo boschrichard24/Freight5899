@@ -21,9 +21,13 @@ public abstract class AutoSupplies extends LinearOpMode{
     private DcMotor right_Back_Drive = null;
     private DcMotor left_Front_Drive = null;
     private DcMotor right_Front_Drive = null;
+
     private DcMotor left_Arm_Motor = null;
     private DcMotor right_Arm_Motor = null;
-    private Servo claw_Servo = null;
+    private DcMotor pivot_Arm_Motor = null;
+
+    private Servo claw_Neck_Servo = null;  // This moves the entire claw up and down \\
+    private Servo claw_Mouth_Servo = null;  // This is the open and close servo of the claw \\
     //private DcMotor ducky = null;
 
     // For the claw servo \\
@@ -46,7 +50,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
         left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
-        claw_Servo = hardwareMap.get(Servo.class, "claw");
+        claw_Neck_Servo = hardwareMap.get(Servo.class, "claw_Neck_Servo")
+        claw_Mouth_Servo = hardwareMap.get(Servo.class, "claw_Mouth_Servo");
         // ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         // Set the direction for each of the motors \\
@@ -60,23 +65,27 @@ public abstract class AutoSupplies extends LinearOpMode{
     }
 
     //move
-    public void move()
+    public void move(double leftPower, double rightPower)
     {
         //sets the power of the motors
         runtime.reset();
         while (opModeIsActive()) {
-
+            left_Back_Drive.setPower(leftPower);
+            left_Front_Drive.setPower(leftPower);
+            right_Back_Drive.setPower(rightPower);
+            right_Front_Drive.setPower(rightPower);
         }
     }
-    public void setPower(double leftPower, double rightPower)
+
+    // This is only for arm tests but maybe not actually i dont know :|
+    public void setArmPowers(double mainMotor, double innerAngleMotor, double pivotMotor)
     {
-        left_Front_Drive.setPower(leftPower);
-        left_Back_Drive.setPower(leftPower);
-        right_Front_Drive.setPower(rightPower);
-        right_Back_Drive.setPower(rightPower);
+        left_Arm_Motor.setPower(innerAngleMotor);
+        right_Arm_Motor.setPower(mainMotor);
+        pivotMotor.setPower(pivotMotor)
     }
 
-    public void toggleClaw(double increment, double maxAngle, double minAngle, boolean open)
+    public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
     {
         if (open && newPosition < maxAngle) {
             newPosition += increment;
@@ -84,7 +93,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         else if (!open && newPosition > minAngle) {
             newPosition -= increment;
         }
-        claw_Servo.setPosition(newPosition);
+        claw_Mouth_Servo.setPosition(newPosition);
     }
 
     public void initForAutonomous()
