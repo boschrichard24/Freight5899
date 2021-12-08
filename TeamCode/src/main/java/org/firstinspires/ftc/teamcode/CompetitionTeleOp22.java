@@ -38,30 +38,30 @@ public class CompetitionTeleOp22 extends AutoSupplies {
             rightMoveInput = Range.clip(rightMoveInput, -1.0, 1.0);
 
             if (gamepad1.right_bumper) {
-                pivotPower = 5.0;
+                pivotPower = 0.5;
             }
             else if (gamepad1.left_bumper) {
-                pivotPower = -5.0;
+                pivotPower = -0.5;
             }
             else {
                 pivotPower = 0.0;
             }
 
             if (gamepad2.y) {
-                mainArmPower = 5.0;
+                mainArmPower = 0.5;
             }
             else if (gamepad2.a) {
-                mainArmPower = -5.0;
+                mainArmPower = -0.5;
             }
             else {
                 mainArmPower = 0.0;
             }
 
             if (gamepad2.x) {
-                innerAngleArmPower = 5.0;
+                innerAngleArmPower = 0.5;
             }
             else if (gamepad2.b) {
-                innerAngleArmPower = -5.0;
+                innerAngleArmPower = -0.5;
             }
             else {
                 innerAngleArmPower = 0.0;

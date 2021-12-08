@@ -68,13 +68,10 @@ public abstract class AutoSupplies extends LinearOpMode{
     public void move(double leftPower, double rightPower)
     {
         //sets the power of the motors
-        runtime.reset();
-        while (opModeIsActive()) {
-            left_Back_Drive.setPower(leftPower);
-            left_Front_Drive.setPower(leftPower);
-            right_Back_Drive.setPower(rightPower);
-            right_Front_Drive.setPower(rightPower);
-        }
+        left_Back_Drive.setPower(leftPower);
+        left_Front_Drive.setPower(leftPower);
+        right_Back_Drive.setPower(rightPower);
+        right_Front_Drive.setPower(rightPower);
     }
 
     // This is only for arm tests but maybe not actually i dont know :|
