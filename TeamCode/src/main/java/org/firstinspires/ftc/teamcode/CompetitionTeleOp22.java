@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
 
@@ -14,9 +15,9 @@ public class CompetitionTeleOp22 extends AutoSupplies {
     private double mainArmPower = 0.0;
     private double innerAngleArmPower = 0.0;
 
-    private double clawIncrement = 0.03;
-    private double clawAngleMax = 135.0;
-    private double clawAngleMin = 0.0;
+    final private double clawIncrement = 0.03;
+    final private double clawAngleMax = 135.0;
+    final private double clawAngleMin = 0.0;
 
 // test
     @Override
