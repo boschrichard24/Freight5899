@@ -81,17 +81,17 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivotMotor.setPower(pivotMotor);
     }
 
-    public int getRequestedPosition(int positionLevel)
+    public void getRequestedPosition(int positionLevel)
     {
         resetArmEncoders();
-        int level = positionLevel;
-        if (level == 1) {
+        //int level = positionLevel;
+        //if (level == 1) {
 
-        }
-        return null;
+        //}
+        //return null;
     }
 
-    public void setArmPosition()
+    public void setArmPosition(int level)
     {
 
     }
