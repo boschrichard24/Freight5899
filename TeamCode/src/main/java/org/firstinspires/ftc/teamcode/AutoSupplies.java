@@ -26,9 +26,8 @@ public abstract class AutoSupplies extends LinearOpMode{
     private DcMotor right_Arm_Motor = null;
     private DcMotor pivot_Arm_Motor = null;
 
-    private Servo claw_Neck_Servo = null;  // This moves the entire claw up and down \\
-    private Servo claw_Mouth_Servo = null;  // This is the open and close servo of the claw \\
-    //private DcMotor ducky = null;
+    private Servo claw_Servo = null;  // This is the open and close servo of the claw \\
+    private DcMotor ducky = null;
 
     // For the claw servo \\
     double newPosition;
@@ -50,9 +49,9 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
         left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
-        claw_Neck_Servo = hardwareMap.get(Servo.class, "claw_Neck_Servo")
-        claw_Mouth_Servo = hardwareMap.get(Servo.class, "claw_Mouth_Servo");
-        // ducky = hardwareMap.get(DcMotor.class, "ducky");
+
+        claw_Servo = hardwareMap.get(DcMotor.class, "claw_Mouth_Servo");
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -61,7 +60,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
         right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        //ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     //move
@@ -79,7 +78,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     {
         left_Arm_Motor.setPower(innerAngleMotor);
         right_Arm_Motor.setPower(mainMotor);
-        pivotMotor.setPower(pivotMotor)
+        pivotMotor.setPower(pivotMotor);
     }
 
     public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
@@ -90,7 +89,21 @@ public abstract class AutoSupplies extends LinearOpMode{
         else if (!open && newPosition > minAngle) {
             newPosition -= increment;
         }
-        claw_Mouth_Servo.setPosition(newPosition);
+        claw_Servo.setPosition(newPosition);
+    }
+
+    public void resetArmEncoders(){
+        left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void duckyMotorPower(double power)
+    {
+        ducky.setPower(power);
     }
 
     public void initForAutonomous()
