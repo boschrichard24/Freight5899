@@ -81,6 +81,21 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivotMotor.setPower(pivotMotor);
     }
 
+    public int getRequestedPosition(int positionLevel)
+    {
+        resetArmEncoders();
+        int level = positionLevel;
+        if (level == 1) {
+
+        }
+        return null;
+    }
+
+    public void setArmPosition()
+    {
+
+    }
+
     public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
     {
         if (open && newPosition < maxAngle) {
