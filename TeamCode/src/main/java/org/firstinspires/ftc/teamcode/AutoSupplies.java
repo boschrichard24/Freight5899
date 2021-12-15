@@ -85,7 +85,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     public double getRequestedArmPosition(int targetLevel, int lastLevel)
     {
         resetArmEncoders();
-        double encoderTargets[] = new double[2];
+        private double encoderTargets[] = new double[2];
 
         switch (targetLevel) {
             case 1:
@@ -182,7 +182,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         claw_Servo.setPosition(newPosition);
     }
 
-    public void resetArmEncoders(){
+    public void resetArmEncoders()
+    {
         // Reset all encoders and set their modes \\
         left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
