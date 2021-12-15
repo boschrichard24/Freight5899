@@ -62,6 +62,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        resetArmEncoders();
     }
 
     //move
@@ -82,9 +84,13 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setPower(pivotMotor);
     }
 
-    public double[] getRequestedArmPosition(int targetLevel, int lastLevel)
+    public void setArmLevel(int targetLevel, int lastLevel)
     {
-        resetArmEncoders();
+        if (left_Arm_Motor.isBusy() || right_Arm_Motor.isBusy()) {
+            break; // Don't let someone pick a new level is the motors are running \\
+        }
+
+        //resetArmEncoders();  <==  Do this in setup     \\
         double[] encoderTargets = new double[2];
 
         switch (targetLevel) {
@@ -124,53 +130,24 @@ public abstract class AutoSupplies extends LinearOpMode{
             encoderTargets[0] *= -1;
             encoderTargets[0] *= -1;
         }
-
         else {
             encoderTargets[0] = 0.0;
             encoderTargets[1] = 0.0; // The levels are the same as previous but the function was called \\
         }
 
-        return encoderTargets;
+        // Reset the previous level that the robot was at and set the target encoder values \\
+        lastLevel = targetLevel;
+
+        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
     }
 
-    public void setArmPosition(double leftPower, double rightPower, int level, int previousLevel)
+    public void setArmPosition(double power)
     {
-        double[] encoderTargets = new double[2];
-        encoderTargets = getRequestedArmPosition(level, previousLevel);
-        lArmMotorEncoderTarget = encoderTargets[0];
-        rArmMotorEncoderTarget = encoderTargets[1];
-
-        if (lArmMotorEncoderTarget >= 0.0) {
-            leftPower = Math.abs(leftPower);
-        }
-        else if (lArmMotorEncoderTarget < 0.0) {
-            leftPower = -1 * Math.abs(leftPower);
-        }
-
-        if (rArmMotorEncoderTarget >= 0.0) {
-            rightPower = Math.abs(rightPower);
-        }
-        else if (rArmMotorEncoderTarget < 0.0) {
-            rightPower = -1 * Math.abs(rightPower);
-        }
-
-        // This is just a big conditional checking if both motors have not met their targets yet \\
-        // I use Math.abs to get the absolute value because a motor could be at a negative encoder value \\
-        // and need to continue going in a negative direction. If i didn't, the < operator would only work \\
-        // if both values were positive. Math.abs doesn't actually change the value in this case \\
-        while (Math.abs(right_Arm_Motor.getCurrentPosition()) < Math.abs(rArmMotorEncoderTarget) || Math.abs(left_Arm_Motor.getCurrentPosition()) < Math.abs(lArmMotorEncoderTarget)) {
-            if (Math.abs(right_Arm_Motor.getCurrentPosition()) < Math.abs(rArmMotorEncoderTarget)) {
-                right_Arm_Motor.setPower(rightPower);
-            }
-            else {
-                right_Arm_Motor.setPower(0.0);
-            }
-            if (Math.abs(left_Arm_Motor.getCurrentPosition()) < Math.abs(lArmMotorEncoderTarget)) {
-                left_Arm_Motor.setPower(leftPower);
-            }
-            else {
-                left_Arm_Motor.setPower(0.0);
-            }
+        // "While both motors are busy reaching their encoder targets..." \\
+        while (right_Arm_Motor.isBusy() || left_Arm_Motor.isBusy()) {
+            left_Arm_Motor.setPower(power);
+            right_Arm_Motor.setPower(power);
         }
     }
 
@@ -194,6 +171,14 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         pivot_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void setArmEncoderMode()
+    {
+        // Set the mode of the encoders to RUN_TO_POSITION \\
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
     public void duckyMotorPower(double power)

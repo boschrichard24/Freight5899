@@ -16,13 +16,14 @@ public class CompetitionTeleOp22 extends AutoSupplies {
     private double innerAngleArmPower = 0.0;
 
     private int currentArmLevel = 0;
-    private int previousArmLevel = 0;
 
     final private double clawIncrement = 0.03;
     final private double clawAngleMax = 135.0;
     final private double clawAngleMin = 0.0;
 
     final private double duckyPower = 0.7;
+
+    final private double armMotorPower = 0.25;
 
 // test
     @Override
@@ -72,11 +73,25 @@ public class CompetitionTeleOp22 extends AutoSupplies {
                 innerAngleArmPower = 0.0;
             }
 
+            if (gamepad2.a) {
+                setArmLevel(1, currentArmLevel);
+            }
+            if (gamepad2.y) {
+                setArmLevel(5, currentArmLevel);
+            }
+            if (gamepad2.x && currentArmLevel < 5) {
+                setArmLevel(currentArmLevel+1, currentArmLevel);
+            }
+            if (gamepad2.b && currentArmLevel > 1) {
+                setArmLevel(currentArmLevel-1);
+            }
+
             if (gamepad1.right_bumper || gamepad1.left_bumper) {
                 duckyMotorPower(duckyPower);
             }
             move(leftMoveInput, rightMoveInput);
-            setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
+            //setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
+            setArmPosition(armMotorPower);
             toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0);
         }
     }
