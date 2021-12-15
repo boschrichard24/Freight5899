@@ -30,7 +30,8 @@ public abstract class AutoSupplies extends LinearOpMode{
     private DcMotor ducky = null;
 
     // For the claw servo \\
-    double newPosition;
+    double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
+    double rArmMotorEncoderTarget = 0.0; // Tilt of entire arm
 
     //  Declare OpMode Members
     protected ElapsedTime runtime = new ElapsedTime();
@@ -81,19 +82,88 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivotMotor.setPower(pivotMotor);
     }
 
-    public void getRequestedPosition(int positionLevel)
+    public double getRequestedPosition(int targetLevel, int lastLevel)
     {
         resetArmEncoders();
-        //int level = positionLevel;
-        //if (level == 1) {
 
-        //}
-        //return null;
+        // The targetLevel (desired level to move) is above the previous level \\
+        if (targetLevel > lastLevel) {
+            switch (positionLevel) {
+                case 1:
+                    return 1000.0, 0.0; // floor level to pick up pieces \\
+                case 2:
+                    return 1000.0, 0.0; // level 1 on shipping container \\
+                case 3:
+                    return 1000.0, 400.0; // level 2 on shipping container \\
+                case 4:
+                    return 1000.0, 800.0; // level 3 on shipping container \\
+                case 5:
+                    return 1300.0, 1000.0; // top of shipping container for gamepiece \\
+                case 6:
+                    return 1500.0, 1000.0; // high as possible (Caed.. we need this?? :\ ) \\
+                default:
+                    return 1000.0, 0.0; // Default is bottom (level 1) \\
+            }
+        }
+
+        // The targetLevel (level desired to move to) is below the prev. level \\
+        else if (targetLevel < lastLevel) {
+            switch (positionLevel) {
+                case 1:
+                    return -1000.0, 0.0; // floor level to pick up pieces \\
+                case 2:
+                    return -1000.0, 0.0; // level 1 on shipping container \\
+                case 3:
+                    return -1000.0, -400.0; // level 2 on shipping container \\
+                case 4:
+                    return -1000.0, -800.0; // level 3 on shipping container \\
+                case 5:
+                    return -1300.0, -1000.0; // top of shipping container for gamepiece \\
+                case 6:
+                    return -1500.0, -1000.0; // high as possible (Caed.. we need this?? :l ) \\
+                default:
+                    return -1000.0, 0.0; // Default is bottom (level 1) \\
+            }
+        }
+
+        else {
+            return 0.0, 0.0; // The levels are the same as previous but the function was called \\
+        }
     }
 
-    public void setArmPosition(int level)
+    public void setArmPosition(double leftPower, double rightPower, int level, int previousLevel)
     {
+        lArmMotorEncoderTarget, rArmMotorEncoderTarget = getRequestedPosition(level, previousLevel);
 
+        if (lArmMotorEncoderTarget >= 0.0) {
+            leftPower = Math.abs(leftPower);
+        }
+        else if (lArmMotorEncoderTarget < 0.0) {
+            leftPower = -1 * Math.abs(leftPower);
+        }
+
+        if (rArmMotorEncoderTarget >= 0.0) {
+            rightPower = Math.abs(rightPower);
+        }
+        else if (rArmMotorEncoderTarget < 0.0) {
+            rightPower = -1 * Math.abs(rightPower);
+        }
+
+        // This is just a big conditional checking if both motors have not met their targets yet \\
+        // I use Math.abs to get the absolute value because a motor could be at a negative encoder value \\
+        // and need to continue going in a negative direction. If i didn't, the < operator would only work \\
+        // if both values were positive. Math.abs doesn't actually change the value in this case \\
+        while (Math.abs(right_Arm_Motor.getCurrentPosition()) < Math.abs(rArmMotorEncoderTarget) || Math.abs(left_Arm_Motor.getCurrentPosition()) < Math.abs(lArmMotorEncoderTarget)) {
+            if (Math.abs(right_Arm_Motor.getCurrentPosition()) < Math.abs(rArmMotorEncoderTarget)) {
+                right_Arm_Motor.setPower(rightPower);
+            }
+            if (Math.abs(left_Arm_Motor.getCurrentPosition()) < Math.abs(lArmMotorEncoderTarget)) {
+                left_Arm_Motor.setPower(leftPower);
+            }
+        }
+        // Remember to set the motors to 0 or you will have a bad day \\
+        right_Arm_Motor.setPower(0.0);
+        left_Arm_Motor.setPower(0.0);
     }
 
     public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
@@ -108,6 +178,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     }
 
     public void resetArmEncoders(){
+        // Reset all encoders and set their modes \\
         left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
