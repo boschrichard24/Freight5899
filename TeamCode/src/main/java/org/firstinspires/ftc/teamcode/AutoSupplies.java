@@ -85,7 +85,39 @@ public abstract class AutoSupplies extends LinearOpMode{
     public double getRequestedPosition(int targetLevel, int lastLevel)
     {
         resetArmEncoders();
+        double encoderTargets[] = new double[2];
 
+        switch (positionLevel) {
+            case 1:
+                encoderTargets[0] = 1000.0;
+                encoderTargets[1] = 0.0; // floor level to pick up pieces \\
+            case 2:
+                encoderTargets[0] = 1100.0;
+                encoderTargets[1] = 0.0; // level 1 on shipping container \\
+            case 3:
+                encoderTargets[0] = 1100.0;
+                encoderTargets[1] = 400.0; // level 2 on shipping container \\
+            case 4:
+                encoderTargets[0] = 1000.0;
+                encoderTargets[1] = 800.0; // level 3 on shipping container \\
+            case 5:
+                encoderTargets[0] = 1300.0;
+                encoderTargets[1] = 1000.0; // top of shipping container for gamepiece \\
+            case 6:
+                encoderTargets[0] = 1500.0;
+                encoderTargets[1] = 1000.0; // high as possible (Caed.. we need this?? :\ ) \\
+            default:
+                encoderTargets[0] = 1000.0;
+                encoderTargets[1] = 0.0; // Default is bottom (level 1) \\
+        if (targetLevel > lastLevel) {
+            return encoderTargets;
+        }
+        else if (targetLevel < lastLevel) {
+            encoderTargets[0] *= -1;
+            encoderTargets[0] *= -1;
+            return encoderTargets;
+        }
+        /*
         // The targetLevel (desired level to move) is above the previous level \\
         if (targetLevel > lastLevel) {
             switch (positionLevel) {
@@ -124,7 +156,7 @@ public abstract class AutoSupplies extends LinearOpMode{
                 default:
                     return -1000.0, 0.0; // Default is bottom (level 1) \\
             }
-        }
+        }*/
 
         else {
             return 0.0, 0.0; // The levels are the same as previous but the function was called \\
