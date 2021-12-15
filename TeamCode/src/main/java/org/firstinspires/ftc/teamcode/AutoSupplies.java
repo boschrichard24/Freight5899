@@ -87,59 +87,56 @@ public abstract class AutoSupplies extends LinearOpMode{
     public void setArmLevel(int targetLevel, int lastLevel)
     {
         if (left_Arm_Motor.isBusy() || right_Arm_Motor.isBusy()) {
-            break; // Don't let someone pick a new level is the motors are running \\
-        }
 
-        //resetArmEncoders();  <==  Do this in setup     \\
-        double[] encoderTargets = new double[2];
+            //resetArmEncoders();  <==  Do this in setup     \\
+            int[] encoderTargets = new int[2];
 
-        switch (targetLevel) {
-            case 1:
-                encoderTargets[0] = 1000.0;
-                encoderTargets[1] = 0.0; // floor level to pick up pieces \\
-                break;
-            case 2:
-                encoderTargets[0] = 1100.0;
-                encoderTargets[1] = 0.0; // level 1 on shipping container \\
-                break;
-            case 3:
-                encoderTargets[0] = 1100.0;
-                encoderTargets[1] = 400.0; // level 2 on shipping container \\
-                break;
-            case 4:
-                encoderTargets[0] = 1000.0;
-                encoderTargets[1] = 800.0; // level 3 on shipping container \\
-                break;
-            case 5:
-                encoderTargets[0] = 1300.0;
-                encoderTargets[1] = 1000.0; // top of shipping container for gamepiece \\
-                break;
-            case 6:
-                encoderTargets[0] = 1500.0;
-                encoderTargets[1] = 1000.0; // high as possible (Caed.. we need this?? :\ ) \\
-                break;
-            default:
-                encoderTargets[0] = 1000.0;
-                encoderTargets[1] = 0.0; // Default is bottom (level 1) \\
-                break;
-        }
-        if (targetLevel > lastLevel) {
-            // "Don't change the values" \\
-        }
-        else if (targetLevel < lastLevel) {
-            encoderTargets[0] *= -1;
-            encoderTargets[0] *= -1;
-        }
-        else {
-            encoderTargets[0] = 0.0;
-            encoderTargets[1] = 0.0; // The levels are the same as previous but the function was called \\
-        }
+            switch (targetLevel) {
+                case 1:
+                    encoderTargets[0] = 1000;
+                    encoderTargets[1] = 0; // floor level to pick up pieces \\
+                    break;
+                case 2:
+                    encoderTargets[0] = 1100;
+                    encoderTargets[1] = 0; // level 1 on shipping container \\
+                    break;
+                case 3:
+                    encoderTargets[0] = 1100;
+                    encoderTargets[1] = 400; // level 2 on shipping container \\
+                    break;
+                case 4:
+                    encoderTargets[0] = 1000;
+                    encoderTargets[1] = 800; // level 3 on shipping container \\
+                    break;
+                case 5:
+                    encoderTargets[0] = 1300;
+                    encoderTargets[1] = 1000; // top of shipping container for gamepiece \\
+                    break;
+                case 6:
+                    encoderTargets[0] = 1500;
+                    encoderTargets[1] = 1000; // high as possible (Caed.. we need this?? :\ ) \\
+                    break;
+                default:
+                    encoderTargets[0] = 1000;
+                    encoderTargets[1] = 0; // Default is bottom (level 1) \\
+                    break;
+            }
+            if (targetLevel > lastLevel) {
+                // "Don't change the values" \\
+            } else if (targetLevel < lastLevel) {
+                encoderTargets[0] *= -1;
+                encoderTargets[0] *= -1;
+            } else {
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 0; // The levels are the same as previous but the function was called \\
+            }
 
-        // Reset the previous level that the robot was at and set the target encoder values \\
-        lastLevel = targetLevel;
+            // Reset the previous level that the robot was at and set the target encoder values \\
+            lastLevel = targetLevel;
 
-        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        }
     }
 
     public void setArmPosition(double power)

@@ -83,7 +83,7 @@ public class CompetitionTeleOp22 extends AutoSupplies {
                 setArmLevel(currentArmLevel+1, currentArmLevel);
             }
             if (gamepad2.b && currentArmLevel > 1) {
-                setArmLevel(currentArmLevel-1);
+                setArmLevel(currentArmLevel-1, currentArmLevel);
             }
 
             if (gamepad1.right_bumper || gamepad1.left_bumper) {
