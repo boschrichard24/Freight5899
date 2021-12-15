@@ -117,46 +117,6 @@ public abstract class AutoSupplies extends LinearOpMode{
             encoderTargets[0] *= -1;
             return encoderTargets;
         }
-        /*
-        // The targetLevel (desired level to move) is above the previous level \\
-        if (targetLevel > lastLevel) {
-            switch (positionLevel) {
-                case 1:
-                    return 1000.0, 0.0; // floor level to pick up pieces \\
-                case 2:
-                    return 1000.0, 0.0; // level 1 on shipping container \\
-                case 3:
-                    return 1000.0, 400.0; // level 2 on shipping container \\
-                case 4:
-                    return 1000.0, 800.0; // level 3 on shipping container \\
-                case 5:
-                    return 1300.0, 1000.0; // top of shipping container for gamepiece \\
-                case 6:
-                    return 1500.0, 1000.0; // high as possible (Caed.. we need this?? :\ ) \\
-                default:
-                    return 1000.0, 0.0; // Default is bottom (level 1) \\
-            }
-        }
-
-        // The targetLevel (level desired to move to) is below the prev. level \\
-        else if (targetLevel < lastLevel) {
-            switch (positionLevel) {
-                case 1:
-                    return -1000.0, 0.0; // floor level to pick up pieces \\
-                case 2:
-                    return -1000.0, 0.0; // level 1 on shipping container \\
-                case 3:
-                    return -1000.0, -400.0; // level 2 on shipping container \\
-                case 4:
-                    return -1000.0, -800.0; // level 3 on shipping container \\
-                case 5:
-                    return -1300.0, -1000.0; // top of shipping container for gamepiece \\
-                case 6:
-                    return -1500.0, -1000.0; // high as possible (Caed.. we need this?? :l ) \\
-                default:
-                    return -1000.0, 0.0; // Default is bottom (level 1) \\
-            }
-        }*/
 
         else {
             return 0.0, 0.0; // The levels are the same as previous but the function was called \\
