@@ -77,7 +77,7 @@ public class CompetitionTeleOp22 extends AutoSupplies {
             }
             move(leftMoveInput, rightMoveInput);
             setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
-            toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x);
+            toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0);
         }
     }
 }

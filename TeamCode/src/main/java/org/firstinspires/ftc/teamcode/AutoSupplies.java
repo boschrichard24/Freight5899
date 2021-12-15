@@ -51,7 +51,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
 
-        claw_Servo = hardwareMap.get(DcMotor.class, "claw_Mouth_Servo");
+        claw_Servo = hardwareMap.get(Servo.class, "claw_Servo");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         // Set the direction for each of the motors \\
@@ -79,13 +79,13 @@ public abstract class AutoSupplies extends LinearOpMode{
     {
         left_Arm_Motor.setPower(innerAngleMotor);
         right_Arm_Motor.setPower(mainMotor);
-        pivotMotor.setPower(pivotMotor);
+        pivot_Arm_Motor.setPower(pivotMotor);
     }
 
-    public double getRequestedArmPosition(int targetLevel, int lastLevel)
+    public double[] getRequestedArmPosition(int targetLevel, int lastLevel)
     {
         resetArmEncoders();
-        private double encoderTargets[] = new double[2];
+        double[] encoderTargets = new double[2];
 
         switch (targetLevel) {
             case 1:
@@ -130,12 +130,15 @@ public abstract class AutoSupplies extends LinearOpMode{
             encoderTargets[1] = 0.0; // The levels are the same as previous but the function was called \\
         }
 
-        return encoderTargets[];
+        return encoderTargets;
     }
 
     public void setArmPosition(double leftPower, double rightPower, int level, int previousLevel)
     {
-        lArmMotorEncoderTarget, rArmMotorEncoderTarget = getRequestedArmPosition(level, previousLevel);
+        double[] encoderTargets = new double[2];
+        encoderTargets = getRequestedArmPosition(level, previousLevel);
+        lArmMotorEncoderTarget = encoderTargets[0];
+        rArmMotorEncoderTarget = encoderTargets[1];
 
         if (lArmMotorEncoderTarget >= 0.0) {
             leftPower = Math.abs(leftPower);
@@ -171,7 +174,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         }
     }
 
-    public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
+    public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open, double newPosition)
     {
         if (open && newPosition < maxAngle) {
             newPosition += increment;
