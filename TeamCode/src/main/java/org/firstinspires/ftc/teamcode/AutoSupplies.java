@@ -82,50 +82,60 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivotMotor.setPower(pivotMotor);
     }
 
-    public double getRequestedPosition(int targetLevel, int lastLevel)
+    public double getRequestedArmPosition(int targetLevel, int lastLevel)
     {
         resetArmEncoders();
         double encoderTargets[] = new double[2];
 
-        switch (positionLevel) {
+        switch (targetLevel) {
             case 1:
                 encoderTargets[0] = 1000.0;
                 encoderTargets[1] = 0.0; // floor level to pick up pieces \\
+                break;
             case 2:
                 encoderTargets[0] = 1100.0;
                 encoderTargets[1] = 0.0; // level 1 on shipping container \\
+                break;
             case 3:
                 encoderTargets[0] = 1100.0;
                 encoderTargets[1] = 400.0; // level 2 on shipping container \\
+                break;
             case 4:
                 encoderTargets[0] = 1000.0;
                 encoderTargets[1] = 800.0; // level 3 on shipping container \\
+                break;
             case 5:
                 encoderTargets[0] = 1300.0;
                 encoderTargets[1] = 1000.0; // top of shipping container for gamepiece \\
+                break;
             case 6:
                 encoderTargets[0] = 1500.0;
                 encoderTargets[1] = 1000.0; // high as possible (Caed.. we need this?? :\ ) \\
+                break;
             default:
                 encoderTargets[0] = 1000.0;
                 encoderTargets[1] = 0.0; // Default is bottom (level 1) \\
+                break;
+        }
         if (targetLevel > lastLevel) {
-            return encoderTargets;
+            // "Don't change the values" \\
         }
         else if (targetLevel < lastLevel) {
             encoderTargets[0] *= -1;
             encoderTargets[0] *= -1;
-            return encoderTargets;
         }
 
         else {
-            return 0.0, 0.0; // The levels are the same as previous but the function was called \\
+            encoderTargets[0] = 0.0;
+            encoderTargets[1] = 0.0; // The levels are the same as previous but the function was called \\
         }
+
+        return encoderTargets[];
     }
 
     public void setArmPosition(double leftPower, double rightPower, int level, int previousLevel)
     {
-        lArmMotorEncoderTarget, rArmMotorEncoderTarget = getRequestedPosition(level, previousLevel);
+        lArmMotorEncoderTarget, rArmMotorEncoderTarget = getRequestedArmPosition(level, previousLevel);
 
         if (lArmMotorEncoderTarget >= 0.0) {
             leftPower = Math.abs(leftPower);
@@ -149,13 +159,16 @@ public abstract class AutoSupplies extends LinearOpMode{
             if (Math.abs(right_Arm_Motor.getCurrentPosition()) < Math.abs(rArmMotorEncoderTarget)) {
                 right_Arm_Motor.setPower(rightPower);
             }
+            else {
+                right_Arm_Motor.setPower(0.0);
+            }
             if (Math.abs(left_Arm_Motor.getCurrentPosition()) < Math.abs(lArmMotorEncoderTarget)) {
                 left_Arm_Motor.setPower(leftPower);
             }
+            else {
+                left_Arm_Motor.setPower(0.0);
+            }
         }
-        // Remember to set the motors to 0 or you will have a bad day \\
-        right_Arm_Motor.setPower(0.0);
-        left_Arm_Motor.setPower(0.0);
     }
 
     public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open)
