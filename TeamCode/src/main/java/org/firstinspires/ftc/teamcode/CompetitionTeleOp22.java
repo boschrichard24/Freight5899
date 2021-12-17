@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
@@ -35,6 +38,7 @@ public class CompetitionTeleOp22 extends AutoSupplies {
         runtime.reset();
 
         setup();
+        resetArmEncoders();
 
         while (opModeIsActive()){
             leftMoveInput = gamepad1.left_stick_y;
@@ -94,5 +98,30 @@ public class CompetitionTeleOp22 extends AutoSupplies {
             setArmPosition(armMotorPower);
             toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0);
         }
+    }
+
+    public void setup()
+    {
+        // Initialize the hardware variables. Note that the strings used here as parameters
+        // to 'get' must correspond to the names assigned during the robot configuration
+        // step (using the FTC Robot Controller app on the phone).
+        left_Back_Drive  = hardwareMap.get(DcMotor .class, "left_Back_Drive");
+        right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
+        left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_Drive");
+        right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
+        left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
+        right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
+
+        claw_Servo = hardwareMap.get(Servo .class, "claw_Servo");
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+
+        // Set the direction for each of the motors \\
+        left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
+        left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
+        right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 }
