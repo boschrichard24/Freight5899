@@ -231,6 +231,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             if (gamepad1.right_bumper || gamepad1.left_bumper) {
                 duckyMotorPower(duckyPower);
             }
+            else {
+                duckyMotorPower(0.0);
+            }
             move(leftMoveInput, rightMoveInput);
             //setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
             setArmPosition(armMotorPower);
