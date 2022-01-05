@@ -182,7 +182,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         //runtime.reset();      not necessary
 
         //setup();
-        resetArmEncoders();
+        //resetArmEncoders();
 
         while (opModeIsActive()) {
             leftMoveInput = gamepad1.left_stick_y;
