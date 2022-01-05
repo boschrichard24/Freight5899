@@ -196,13 +196,13 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 setArmLevel(currentArmLevel - 1, currentArmLevel);
             }
 
-            /*if (gamepad1.right_bumper || gamepad1.left_bumper) {
+            if (gamepad1.right_bumper || gamepad1.left_bumper) {
                 duckyMotorPower(duckyPower);
             }
             move(leftMoveInput, rightMoveInput);
             //setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
-            setArmPosition(armMotorPower);
-            toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0); */
+            //setArmPosition(armMotorPower);
+            toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0);
         }
     }
 }
