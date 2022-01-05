@@ -17,17 +17,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public abstract class AutoSupplies extends LinearOpMode{
     // Motors, servos, etc.
-    private DcMotor left_Back_Drive = null;
-    private DcMotor right_Back_Drive = null;
-    private DcMotor left_Front_Drive = null;
-    private DcMotor right_Front_Drive = null;
+    protected DcMotor left_Back_Drive = null;
+    protected DcMotor right_Back_Drive = null;
+    protected DcMotor left_Front_Drive = null;
+    protected DcMotor right_Front_Drive = null;
 
-    private DcMotor left_Arm_Motor = null;
-    private DcMotor right_Arm_Motor = null;
-    private DcMotor pivot_Arm_Motor = null;
+    protected DcMotor left_Arm_Motor = null;
+    protected DcMotor right_Arm_Motor = null;
+    protected DcMotor pivot_Arm_Motor = null;
 
-    private Servo claw_Servo = null;  // This is the open and close servo of the claw \\
-    private DcMotor ducky = null;
+    protected Servo claw_Servo = null;  // This is the open and close servo of the claw \\
+    protected DcMotor ducky = null;
 
     // For the claw servo \\
     double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
@@ -39,32 +39,10 @@ public abstract class AutoSupplies extends LinearOpMode{
 
     //---callable methods---\\
 
-    public void setup()
+    /*public void setup()
     {
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        left_Back_Drive  = hardwareMap.get(DcMotor.class, "left_Back_Drive");
-        right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
-        left_Front_Drive  = hardwareMap.get(DcMotor.class, "left_Front_Drive");
-        right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
-        left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
-        right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
-
-        claw_Servo = hardwareMap.get(Servo.class, "claw_Servo");
-        ducky = hardwareMap.get(DcMotor.class, "ducky");
-
-        // Set the direction for each of the motors \\
-        left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
-        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
-        left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
-        right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
-        right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-
         resetArmEncoders();
-    }
+    }*/
 
     //move
     public void move(double leftPower, double rightPower)
