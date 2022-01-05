@@ -41,11 +41,14 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     public void resetArmEncoders() {
         // Reset all encoders and set their modes \\
         left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         pivot_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void setArmEncoderMode() {
