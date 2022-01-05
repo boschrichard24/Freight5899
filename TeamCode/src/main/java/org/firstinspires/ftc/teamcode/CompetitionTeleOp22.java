@@ -162,9 +162,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         claw_Servo = hardwareMap.get(Servo.class, "claw_Servo");
 
-        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //left_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //right_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
