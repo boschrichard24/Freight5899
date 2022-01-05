@@ -7,6 +7,22 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
 
 public class CompetitionTeleOp22 extends AutoSupplies {
+    // Motors, servos, etc.
+    private DcMotor left_Back_Drive = null;
+    private DcMotor right_Back_Drive = null;
+    private DcMotor left_Front_Drive = null;
+    private DcMotor right_Front_Drive = null;
+
+    private DcMotor left_Arm_Motor = null;
+    private DcMotor right_Arm_Motor = null;
+    private DcMotor pivot_Arm_Motor = null;
+
+    private Servo claw_Servo = null;  // This is the open and close servo of the claw \\
+    private DcMotor ducky = null;
+
+    // For the claw servo \\
+    double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
+    double rArmMotorEncoderTarget = 0.0; // Tilt of entire arm
 
     private double leftMoveInput = 0.0;
     private double rightMoveInput = 0.0;
