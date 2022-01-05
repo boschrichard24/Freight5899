@@ -118,6 +118,31 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         }
     }
 
+    public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open, double newPosition)
+    {
+        if (open && newPosition < maxAngle) {
+            newPosition += increment;
+        }
+        else if (!open && newPosition > minAngle) {
+            newPosition -= increment;
+        }
+        claw_Servo.setPosition(newPosition);
+    }
+
+    public void move(double leftPower, double rightPower)
+    {
+        //sets the power of the motors
+        left_Back_Drive.setPower(leftPower);
+        left_Front_Drive.setPower(leftPower);
+        right_Back_Drive.setPower(rightPower);
+        right_Front_Drive.setPower(rightPower);
+    }
+
+    public void duckyMotorPower(double power)
+    {
+        ducky.setPower(power);
+    }
+
     // ******************               test               ******************  \\
     @Override
     public void runOpMode() {
@@ -201,7 +226,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             }
             move(leftMoveInput, rightMoveInput);
             //setArmPowers(mainArmPower, innerAngleArmPower, pivotPower);
-            //setArmPosition(armMotorPower);
+            setArmPosition(armMotorPower);
             toggleClaw(clawIncrement, clawAngleMin, clawAngleMax, gamepad1.x, 0.0);
         }
     }
