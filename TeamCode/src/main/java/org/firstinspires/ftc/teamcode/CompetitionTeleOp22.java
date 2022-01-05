@@ -153,6 +153,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
         left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
+        left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
         left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
         right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
@@ -185,11 +186,11 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         //resetArmEncoders();
 
         while (opModeIsActive()) {
-            leftMoveInput = gamepad1.left_stick_y;
-            rightMoveInput = gamepad1.right_stick_y;
+            rightMoveInput = gamepad1.left_stick_y;
+            leftMoveInput = gamepad1.right_stick_y;
 
-            leftMoveInput = Range.clip(leftMoveInput, -1.0, 1.0);
-            rightMoveInput = Range.clip(rightMoveInput, -1.0, 1.0);
+            rightMoveInput = Range.clip(leftMoveInput, -1.0, 1.0);
+            leftMoveInput = Range.clip(rightMoveInput, -1.0, 1.0);
 
             if (gamepad1.right_bumper) {
                 pivotPower = 0.5;
