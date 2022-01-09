@@ -47,6 +47,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     boolean changed5 = false;
     boolean changed6 = false;
 
+    boolean changedToNewLevel = false;
+
 
 
 //    **********     MISC FUNCTIONS     **********     \\
@@ -56,12 +58,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     {
         left_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    }
-
-    public void setRunEncoders()
-    {
-        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // you need to change the setMode to RUN_TO_POSITION when you want to change level \\
     }
 
     public void runArmPower(double power)
@@ -107,6 +106,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
+
         runArmPower(.5);
         left_Arm_Motor.setTargetPosition(encoderTargets[0]);
         right_Arm_Motor.setTargetPosition(encoderTargets[1]);
@@ -148,38 +148,36 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 //  E N C O D E R S SET up  \\
         resetArmEncoders();
-        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //setRunEncoders();
 
         while (opModeIsActive()) {
 //  M O V E  func  \\
             //  S P E E D   \\
-            if(gamepad1.a && !changed1){
-
-            }
             leftMovePower = -gamepad1.left_stick_y;
             rightMovePower = -gamepad1.right_stick_y;
             left_Back_Drive.setPower(leftMovePower);
             right_Back_Drive.setPower(rightMovePower);
             left_Front_Drive.setPower(leftMovePower);
             right_Front_Drive.setPower(rightMovePower);
-            if(gamepad1.a && !changed1){
-                double lfSpeed = Range.clip(leftMovePower, -5, 5);
-                double rtSpeed = Range.clip(rightMovePower, -5, 5);
+            if(gamepad1.a && !changed1) {
+                double lfSpeed = Range.clip(leftMovePower, -2, 2);
+                double rtSpeed = Range.clip(rightMovePower, -2, 2);
+                left_Back_Drive.setPower(lfSpeed);
+                right_Back_Drive.setPower(rtSpeed);
+                left_Front_Drive.setPower(lfSpeed);
+                right_Front_Drive.setPower(rtSpeed);
+                changed1 = true;
             }
-            changed1 = true;
-            if(!gamepad1.a && changed1){
+            else if (!gamepad1.a){
                 changed1 = false;
             }
 
             //   I N V E R S E   \\
-            if(gamepad1.x && !changed2){
+            if(gamepad1.x && !changed2) {
                 leftMovePower = gamepad1.left_stick_y;
                 rightMovePower = gamepad1.right_stick_y;
+                changed2 = true;
             }
-            changed2 = true;
-            if(!gamepad1.x && changed2){
+            else if(!gamepad1.x){
                 changed2 = false;
             }
 
@@ -191,22 +189,25 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 //pivot_Arm_Motor.setPower(pivotPower);
             }
             else if(gamepad1.right_trigger>0 && !(gamepad1.left_trigger>0)){
-                spin = -gamepad1.right_trigger;
+                spin = -gamepad1.right_trigger*0.5;
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
                 pivot_Arm_Motor.setPower(spin);
             }
 
 //  D U C K Y func  \\
-            if(gamepad1.left_bumper && !ducky.isBusy()){
-                for(int i=0; i<50000; i++){            // NEED A GOOD WAY TO DELAY INCRE BY 1 SEC
+            runtime.reset();
+            if(gamepad1.right_bumper && !ducky.isBusy()){
+                long millis = 2000;
+                runtime.reset();
+                while(runtime.milliseconds() <= millis){
                     ducky.setPower(duckyPower);
-                    duckyPower *= 1.1;
+                    duckyPower += 0.001;
                 }
             }
 
 //  A R M  func  \\
-            if(gamepad2.dpad_up && !changed3){
+            /*if(gamepad2.dpad_up && !changed3){
                 if(level == 7){level = 0;}
                 level ++;
                 if(level > 6){level = 6;}
@@ -225,9 +226,48 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             if(gamepad2.y && !changed6){
                 level = 3;
                 changed6 = true;
-            }else if(!gamepad2.y){changed6 = false;}
+            }else if(!gamepad2.y){changed6 = false;} */
 
-            setArmLevel(level);
+            // This will set a new level when you press the dpad button up and \\
+            // will wait until you let go to be able to go to a new level \\
+
+            int prevLevel = level;
+
+            // "if you press up and you're not at the needed higher level..." \\
+            if (gamepad2.dpad_up && !changedToNewLevel) {
+                if (level >= 6) { level = 6; }
+                else if (level < 6) { level ++; }
+                changedToNewLevel = true;
+            }
+            // "if you press down and you're not at the needed lower level..." \\
+            else if (gamepad2.dpad_down && !changedToNewLevel) {
+                if (level <= 1) { level = 1; }
+                else if (level > 1) { level --; }
+                changedToNewLevel = true;
+            }
+            else if (gamepad2.a && changedToNewLevel) {
+                level = 1;
+                changedToNewLevel = true;
+            }
+            // "if neither buttons pressed, reset the button toggle bool" (allows you to press again) \\
+            else if (!gamepad2.dpad_up && !gamepad2.dpad_down) { changedToNewLevel = false; }
+
+            // This will check if a new level if asked for and change the encoder modes \\
+            // "if the level from one frame ago was not the same... " \\
+            if (prevLevel != level) {
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                setArmLevel(level);
+            }
+            // "if the level has not changed, turn off motor and motor encoders" \\
+            else {
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                runArmPower(0.0);
+            }
+            prevLevel = level;
+
+
 //  C L A W func \\
             if(gamepad2.dpad_up && clawPos < clawMax){
                 while(clawPos < clawMax) {
