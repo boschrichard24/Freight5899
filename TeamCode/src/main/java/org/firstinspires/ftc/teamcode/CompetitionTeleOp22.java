@@ -14,14 +14,13 @@ import com.qualcomm.robotcore.util.Range;
 public class CompetitionTeleOp22 extends LinearOpMode {
 
 
-    // ******************               VARIABLE DEFS              ******************  \\
-
+    // ******************               VARIABLE DEF-S              ******************  \\
 
     // Power vars
     private double leftMovePower  = 0.0;
     private double rightMovePower = 0.0;
     private double pivotPower     = 0.0;
-    private double duckyPower     = 0.5;
+    private double duckyPower     = 0.2;
     // Misc. vars
     private double spin         = 0.0;
     private ElapsedTime runtime = new ElapsedTime();
@@ -54,7 +53,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     boolean changedToNewLevel = false;
 
 
-//    **********     MISC FUNCTIONS     **********     \\
+//    **********     MAIN FUNCTIONS     **********     \\
 
 
     public void resetArmEncoders()
@@ -123,13 +122,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         right_Arm_Motor.setTargetPosition(encoderTargets[1]);
     }
 
-
-    // ******************               test func              ******************  \\
-
-
-    @Override
-    public void runOpMode() {
-//  Connect Motors to Phone  \\
+    public void hardwareSetup()
+    {
+        //  Connect Motors to Phone  \\
         left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
         right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
         left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
@@ -154,11 +149,117 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+    }
+
+    public void move()
+    {
+        //  S P E E D   \\
+        leftMovePower = -gamepad1.left_stick_y * powerChange;
+        rightMovePower = -gamepad1.right_stick_y * powerChange;
+        left_Back_Drive.setPower(leftMovePower);
+        right_Back_Drive.setPower(rightMovePower);
+        left_Front_Drive.setPower(leftMovePower);
+        right_Front_Drive.setPower(rightMovePower);
+
+        if(gamepad1.a && !changed1) {
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
+            if(powerChange == 0.5 || powerChange == 2) {
+                powerChange = 1;
+            }
+            else {
+                powerChange = 0.5;
+            }
+            changed1 = true;
+        }
+        else if (!gamepad1.a){
+            changed1 = false;
+        }
+
+        if(gamepad1.b && !changed7) {
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+            if(powerChange == 0.5 || powerChange == 2) {
+                powerChange = 1;
+            }
+            else {
+                powerChange = 2;
+            }
+            changed7 = true;
+        }
+        else if (!gamepad1.b){
+            changed7 = false;
+        }
+        //   I N V E R S E   \\
+        if(gamepad1.x && !changed2) {
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
+            leftMovePower = gamepad1.left_stick_y;
+            rightMovePower = gamepad1.right_stick_y;
+            changed2 = true;
+        }
+        else if(!gamepad1.x){
+            changed2 = false;
+        }
+    }
+
+    public void pivotArmPower()
+    {
+        if(gamepad1.left_trigger>0.1 && !(gamepad1.right_trigger>0.1)) {
+            spin = gamepad1.left_trigger*0.5;
+            pivot_Arm_Motor.setPower(spin);
+            //pivotPower = Range.clip(spin, 0, 0.5);
+            //pivot_Arm_Motor.setPower(pivotPower);
+        }
+        else if(gamepad1.right_trigger>0.1 && !(gamepad1.left_trigger>0.1)){
+            spin = -gamepad1.right_trigger*0.5;
+            //pivotPower = Range.clip(spin, 0, 0.5);
+            //pivot_Arm_Motor.setPower(pivotPower);
+            pivot_Arm_Motor.setPower(spin);
+        }
+    }
+
+    public void armFunction()
+    {
+        int prevLevel = level;
+
+        // "if you press up and you're not at the needed higher level..." \\
+        if (gamepad2.dpad_up && !changedToNewLevel) {
+            if (level >= 6) { level = 6; }
+            else if (level < 6) { level ++; }
+            changedToNewLevel = true;
+        }
+        // "if you press down and you're not at the needed lower level..." \\
+        else if (gamepad2.dpad_down && !changedToNewLevel) {
+            if (level <= 1) { level = 1; }
+            else if (level > 1) { level --; }
+            changedToNewLevel = true;
+        }
+        else if (gamepad2.a && changedToNewLevel) {
+            level = 1;
+            changedToNewLevel = true;
+        }
+        // "if neither buttons pressed, reset the button toggle bool" (allows you to press again) \\
+        else if (!gamepad2.dpad_up && !gamepad2.dpad_down) { changedToNewLevel = false; }
+
+        // This will check if a new level if asked for and change the encoder modes \\
+        // "if the level from one frame ago was not the same... " \\
+        if (prevLevel != level) {
+            right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            setArmLevel(level);
+        }
+        // "if the level has not changed, turn off motor and motor encoders" \\
+        else {
+            right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            runArmPower(0.0);
+        }
+        prevLevel = level;
+    }
+
+
+    @Override
+    public void runOpMode() {
 
         waitForStart();
-        //runtime.reset();      not necessary
-
-
 
 //  E N C O D E R S SET up  \\
         resetArmEncoders();
@@ -167,66 +268,10 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         while (opModeIsActive()) {
 //  M O V E  func  \\
-            //  S P E E D   \\
-            leftMovePower = -gamepad1.left_stick_y * powerChange;
-            rightMovePower = -gamepad1.right_stick_y * powerChange;
-            left_Back_Drive.setPower(leftMovePower);
-            right_Back_Drive.setPower(rightMovePower);
-            left_Front_Drive.setPower(leftMovePower);
-            right_Front_Drive.setPower(rightMovePower);
-
-            if(gamepad1.a && !changed1) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
-                if(powerChange == 0.5 || powerChange == 2) {
-                    powerChange = 1;
-                }
-                else {
-                    powerChange = 0.5;
-                }
-                changed1 = true;
-            }
-            else if (!gamepad1.a){
-                changed1 = false;
-            }
-
-            if(gamepad1.b && !changed7) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
-                if(powerChange == 0.5 || powerChange == 2) {
-                    powerChange = 1;
-                }
-                else {
-                    powerChange = 2;
-                }
-                changed7 = true;
-            }
-            else if (!gamepad1.b){
-                changed7 = false;
-            }
-
-            //   I N V E R S E   \\
-            if(gamepad1.x && !changed2) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
-                leftMovePower = gamepad1.left_stick_y;
-                rightMovePower = gamepad1.right_stick_y;
-                changed2 = true;
-            }
-            else if(!gamepad1.x){
-                changed2 = false;
-            }
+            move();
 
 //  S P I N  func  \\
-            if(gamepad1.left_trigger>0.1 && !(gamepad1.right_trigger>0.1)) {
-                spin = gamepad1.left_trigger*0.5;
-                pivot_Arm_Motor.setPower(spin);
-                //pivotPower = Range.clip(spin, 0, 0.5);
-                //pivot_Arm_Motor.setPower(pivotPower);
-            }
-            else if(gamepad1.right_trigger>0.1 && !(gamepad1.left_trigger>0.1)){
-                spin = -gamepad1.right_trigger*0.5;
-                //pivotPower = Range.clip(spin, 0, 0.5);
-                //pivot_Arm_Motor.setPower(pivotPower);
-                pivot_Arm_Motor.setPower(spin);
-            }
+            pivotArmPower();
 
 //  D U C K Y func  \\
             runtime.reset();
@@ -266,41 +311,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             // This will set a new level when you press the dpad button up and \\
             // will wait until you let go to be able to go to a new level \\
 
-            int prevLevel = level;
-
-            // "if you press up and you're not at the needed higher level..." \\
-            if (gamepad2.dpad_up && !changedToNewLevel) {
-                if (level >= 6) { level = 6; }
-                else if (level < 6) { level ++; }
-                changedToNewLevel = true;
-            }
-            // "if you press down and you're not at the needed lower level..." \\
-            else if (gamepad2.dpad_down && !changedToNewLevel) {
-                if (level <= 1) { level = 1; }
-                else if (level > 1) { level --; }
-                changedToNewLevel = true;
-            }
-            else if (gamepad2.a && changedToNewLevel) {
-                level = 1;
-                changedToNewLevel = true;
-            }
-            // "if neither buttons pressed, reset the button toggle bool" (allows you to press again) \\
-            else if (!gamepad2.dpad_up && !gamepad2.dpad_down) { changedToNewLevel = false; }
-
-            // This will check if a new level if asked for and change the encoder modes \\
-            // "if the level from one frame ago was not the same... " \\
-            if (prevLevel != level) {
-                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                setArmLevel(level);
-            }
-            // "if the level has not changed, turn off motor and motor encoders" \\
-            else {
-                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                runArmPower(0.0);
-            }
-            prevLevel = level;
 
 
 //  C L A W func \\
@@ -316,21 +326,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 }
                 claw.setPosition(clawPos);
             }
-/*
-            if (gamepad2.x) {
-                telemetry.addData("The gamepad2 x button is pressed", " yup");
-                claw.setPower(0.75);
-            }
-            else if (gamepad2.b) {
-                claw.setPower(0.25);
-            }
-            else {
-                claw.setPower(0.0);
-            }
 
-*/
             // ******************               OVERIDE ARM func              ******************  \\
-
 
             if(gamepad2.left_trigger>0.5 && gamepad2.right_trigger>0.5){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_OCEAN_PALETTE);
@@ -360,28 +357,3 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         }
     }
 }
-
-//if (gamepad2.a && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(1);
-//                runArmToPosition(0.5);
-//            }
-//            else if (gamepad2.x && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(2);
-//                runArmToPosition(0.5);
-//            }
-//            else if (gamepad2.y && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(3);
-//                runArmToPosition(0.5);
-//            }
-//            else if (gamepad2.b && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(4);
-//                runArmToPosition(0.5);
-//            }
-//            else if (gamepad2.right_bumper && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(5);
-//                runArmToPosition(0.5);
-//            }
-//            else if (gamepad2.left_bumper && (!left_Arm_Motor.isBusy() && !right_Arm_Motor.isBusy())) {
-//                setArmLevel(6);
-//                runArmToPosition(0.5);
-//            }
