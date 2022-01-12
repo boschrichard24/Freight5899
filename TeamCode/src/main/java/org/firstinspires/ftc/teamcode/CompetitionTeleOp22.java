@@ -29,8 +29,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     public RevBlinkinLedDriver lights;
     // Claw vars
     protected Servo claw        = null;  // This is the open and close servo of the claw \\
-    final private double clawMax       = 0.653;
-    final private double clawMin       = 0.322;
+    final private double clawMax       = 0.401;
+    final private double clawMin       = 0.601;
     private double clawPos             = 0.0;
     private double powerChange         = 1.0;
     // Motors vars
