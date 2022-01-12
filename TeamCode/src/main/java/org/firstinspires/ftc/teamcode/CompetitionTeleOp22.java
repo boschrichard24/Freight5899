@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -28,7 +29,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     private int level = 1;
     public RevBlinkinLedDriver lights;
     // Claw vars
-    protected Servo claw        = null;  // This is the open and close servo of the claw \\
+    protected CRServo claw        = null;  // This is the open and close servo of the claw \\
     final private double clawMax       = 0.653;
     final private double clawMin       = 0.322;
     private double clawPos             = 0.0;
@@ -78,10 +79,12 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         switch (targetLevel) {
             case 1:
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
                 encoderTargets[0] = 0;
                 encoderTargets[1] = 0; // floor level to pick up pieces \\
                 break;
             case 2:
+
                 encoderTargets[0] = 0;
                 encoderTargets[1] = 100; // level 1 on shipping container \\
                 break;
@@ -131,7 +134,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
-        claw = hardwareMap.get(Servo.class, "claw");
+        claw = hardwareMap.get(CRServo.class, "claw");
+        lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
 //  Set the direction for each of the motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
