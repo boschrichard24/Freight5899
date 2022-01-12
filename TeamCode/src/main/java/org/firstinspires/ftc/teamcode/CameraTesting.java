@@ -15,17 +15,22 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 @TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
 @Disabled
 public class CameraTesting extends LinearOpMode {
-    /* Note: This sample uses the all-objects Tensor Flow model (FreightFrenzy_BCDM.tflite), which contains
-     * the following 4 detectable objects
-     *  0: Ball,
-     *  1: Cube,
-     *  2: Duck,
-     *  3: Marker (duck location tape marker)
-     *
-     *  Two additional model assets are available which only contain a subset of the objects:
-     *  FreightFrenzy_BC.tflite  0: Ball,  1: Cube
-     *  FreightFrenzy_DM.tflite  0: Duck,  1: Marker
-     */
+
+    private static final double A_Left = 0;
+    private static final double A_Top = 0; //Fill in with legit values
+    private static final double A_Right = 0;
+    private static final double A_Bottom = 0;
+
+    private static final double B_Left = 0;
+    private static final double B_Top = 0; //Fill in with legit values
+    private static final double B_Right = 0;
+    private static final double B_Bottom = 0;
+
+    private static final double C_Left = 0;
+    private static final double C_Top = 0; //Fill in with legit values
+    private static final double C_Right = 0;
+    private static final double C_Bottom = 0;
+
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
     private static final String[] LABELS = {
             "Ball",
