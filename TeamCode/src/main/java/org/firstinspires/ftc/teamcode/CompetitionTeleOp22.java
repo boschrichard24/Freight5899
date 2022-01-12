@@ -286,7 +286,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 
 //  C L A W func \\
-            if(gamepad2.x && clawPos < clawMax){
+            /*if(gamepad2.x && clawPos < clawMax){
                 while(clawPos < clawMax) {
                     clawPos += 0.3;
                 }
@@ -297,6 +297,16 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                     clawPos -= 0.3;
                 }
                 claw.setPosition(clawPos);
+            }*/
+
+            if (gamepad2.x) {
+                claw.setPower(0.75);
+            }
+            else if (gamepad2.b) {
+                claw.setPower(0.25);
+            }
+            else {
+                claw.setPower(0.0);
             }
 
 
