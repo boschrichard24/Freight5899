@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,16 +21,18 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     private double leftMovePower  = 0.0;
     private double rightMovePower = 0.0;
     private double pivotPower     = 0.0;
-    private double duckyPower     = 0.7;
+    private double duckyPower     = 0.5;
     // Misc. vars
     private double spin         = 0.0;
     private ElapsedTime runtime = new ElapsedTime();
-    private int level = 0;
+    private int level = 1;
+    public RevBlinkinLedDriver lights;
     // Claw vars
     protected Servo claw        = null;  // This is the open and close servo of the claw \\
-    final private double clawMax       = 135.0;
-    final private double clawMin       = 0.0;
-    private double clawPos            = 0.0;
+    final private double clawMax       = 0.653;
+    final private double clawMin       = 0.322;
+    private double clawPos             = 0.0;
+    private double powerChange         = 1.0;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
     protected DcMotor right_Back_Drive  = null;
@@ -46,9 +49,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     boolean changed4 = false;
     boolean changed5 = false;
     boolean changed6 = false;
+    boolean changed7 = false;
 
     boolean changedToNewLevel = false;
-
 
 
 //    **********     MISC FUNCTIONS     **********     \\
@@ -75,34 +78,34 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         switch (targetLevel) {
             case 1:
-                encoderTargets[0] = 1000;
+                encoderTargets[0] = 0;
                 encoderTargets[1] = 0; // floor level to pick up pieces \\
                 break;
             case 2:
-                encoderTargets[0] = 1100;
-                encoderTargets[1] = 0; // level 1 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 100; // level 1 on shipping container \\
                 break;
             case 3:
-                encoderTargets[0] = 1100;
-                encoderTargets[1] = 400; // level 2 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 130; // level 2 on shipping container \\
                 break;
             case 4:
                 //put light code here plug in light into the BLinkin - Blikin plugs inot the servo port - config inside of servo
-                encoderTargets[0] = 1000;
-                encoderTargets[1] = 800; // level 3 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 300; // level 3 on shipping container \\
                 break;
             case 5:
-                encoderTargets[0] = 1300;
-                encoderTargets[1] = 1000; // top of shipping container for gamepiece \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 500; // top of shipping container for gamepiece \\
                 break;
             case 6:
-                encoderTargets[0] = 1500;
-                encoderTargets[1] = 1000; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 530; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 //whatever postiion you want for init
             default:
-                encoderTargets[0] = 1000;
+                encoderTargets[0] = 0;
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
@@ -128,7 +131,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
-        claw = hardwareMap.get(Servo.class, "claw_Servo");
+        claw = hardwareMap.get(Servo.class, "claw");
 
 //  Set the direction for each of the motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -152,23 +155,36 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         while (opModeIsActive()) {
 //  M O V E  func  \\
             //  S P E E D   \\
-            leftMovePower = -gamepad1.left_stick_y;
-            rightMovePower = -gamepad1.right_stick_y;
+            leftMovePower = -gamepad1.left_stick_y * powerChange;
+            rightMovePower = -gamepad1.right_stick_y * powerChange;
             left_Back_Drive.setPower(leftMovePower);
             right_Back_Drive.setPower(rightMovePower);
             left_Front_Drive.setPower(leftMovePower);
             right_Front_Drive.setPower(rightMovePower);
             if(gamepad1.a && !changed1) {
-                double lfSpeed = Range.clip(leftMovePower, -2, 2);
-                double rtSpeed = Range.clip(rightMovePower, -2, 2);
-                left_Back_Drive.setPower(lfSpeed);
-                right_Back_Drive.setPower(rtSpeed);
-                left_Front_Drive.setPower(lfSpeed);
-                right_Front_Drive.setPower(rtSpeed);
+                if(powerChange == 0.5 || powerChange == 2) {
+                    powerChange = 1;
+                }
+                else {
+                    powerChange = 0.5;
+                }
                 changed1 = true;
             }
             else if (!gamepad1.a){
                 changed1 = false;
+            }
+
+            if(gamepad1.b && !changed7) {
+                if(powerChange == 0.5 || powerChange == 2) {
+                    powerChange = 1;
+                }
+                else {
+                    powerChange = 2;
+                }
+                changed7 = true;
+            }
+            else if (!gamepad1.b){
+                changed7 = false;
             }
 
             //   I N V E R S E   \\
@@ -182,13 +198,13 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             }
 
 //  S P I N  func  \\
-            if(gamepad1.left_trigger>0 && !(gamepad1.right_trigger>0)) {
+            if(gamepad1.left_trigger>0.1 && !(gamepad1.right_trigger>0.1)) {
                 spin = gamepad1.left_trigger*0.5;
                 pivot_Arm_Motor.setPower(spin);
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
             }
-            else if(gamepad1.right_trigger>0 && !(gamepad1.left_trigger>0)){
+            else if(gamepad1.right_trigger>0.1 && !(gamepad1.left_trigger>0.1)){
                 spin = -gamepad1.right_trigger*0.5;
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
@@ -204,6 +220,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                     ducky.setPower(duckyPower);
                     duckyPower += 0.001;
                 }
+                ducky.setPower(0);
             }
 
 //  A R M  func  \\
@@ -269,15 +286,17 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 
 //  C L A W func \\
-            if(gamepad2.dpad_up && clawPos < clawMax){
+            if(gamepad2.x && clawPos < clawMax){
                 while(clawPos < clawMax) {
-                    clawPos += 0.03;
+                    clawPos += 0.3;
                 }
+                claw.setPosition(clawPos);
             }
-            else if(gamepad2.dpad_down && clawPos > clawMin){
+            else if(gamepad2.b && clawPos > clawMin){
                 while(clawPos > clawMin) {
-                    clawPos -= 0.03;
+                    clawPos -= 0.3;
                 }
+                claw.setPosition(clawPos);
             }
 
 
@@ -285,6 +304,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 
             if(gamepad2.left_trigger>0.5 && gamepad2.right_trigger>0.5){
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 double armLeftPower;
                 double armRightPower;
                 double armDriveLeft  = -gamepad2.left_stick_y;
@@ -295,13 +316,17 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 right_Arm_Motor.setPower(armRightPower);
             }
 
+
 //  T E M E T R Y  D A T A  \\
+            telemetry.addData("ArmLevel : ", level);
             telemetry.addData("Swivel Left Power:", left_Arm_Motor.getPower());
             telemetry.addData("Swivel Right Power:", right_Arm_Motor.getPower());
 
             //get updated encoder positions
             telemetry.addData("Arm Left Value:",  left_Arm_Motor.getCurrentPosition());
+            telemetry.update();
             telemetry.addData("Arm Right Value:",  right_Arm_Motor.getCurrentPosition());
+            telemetry.update();
         }
     }
 }

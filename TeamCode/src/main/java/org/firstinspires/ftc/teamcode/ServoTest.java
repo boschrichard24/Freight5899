@@ -36,6 +36,7 @@ public class ServoTest extends LinearOpMode {
         right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
+        claw = hardwareMap.get(Servo.class, "claw");
 
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
@@ -46,8 +47,6 @@ public class ServoTest extends LinearOpMode {
         pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
-
-        claw = hardwareMap.get(Servo.class, "claw_Servo");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
