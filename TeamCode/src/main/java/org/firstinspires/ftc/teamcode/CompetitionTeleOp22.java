@@ -256,6 +256,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             }
 
 //  T E M E T R Y  D A T A  \\
+            telemetry.addData("Current Arm Level:", level);
+
             telemetry.addData("Swivel Left Power:", left_Arm_Motor.getPower());
             telemetry.addData("Swivel Right Power:", right_Arm_Motor.getPower());
 
