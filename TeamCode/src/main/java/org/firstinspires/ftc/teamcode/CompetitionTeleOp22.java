@@ -207,14 +207,13 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         if(gamepad1.left_trigger>0.1 && !(gamepad1.right_trigger>0.1)) {
             spin = gamepad1.left_trigger*0.5;
             pivot_Arm_Motor.setPower(spin);
-            //pivotPower = Range.clip(spin, 0, 0.5);
-            //pivot_Arm_Motor.setPower(pivotPower);
         }
         else if(gamepad1.right_trigger>0.1 && !(gamepad1.left_trigger>0.1)){
             spin = -gamepad1.right_trigger*0.5;
-            //pivotPower = Range.clip(spin, 0, 0.5);
-            //pivot_Arm_Motor.setPower(pivotPower);
             pivot_Arm_Motor.setPower(spin);
+        }
+        else {
+            pivot_Arm_Motor.setPower(0.0);
         }
     }
 
