@@ -52,6 +52,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
     boolean changedToNewLevel = false;
 
+    boolean armOverrideActived = false;
+
 
 //    **********     MAIN FUNCTIONS     **********     \\
 
@@ -248,7 +250,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             prevLevel = level;
         }
         // "if the level has not changed, turn off motor and motor encoders" \\
-        else {
+        else if (level == prevLevel) {
             right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             runArmPower(0.0);
@@ -340,17 +342,32 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 armRightPower = Range.clip(armDriveRight, -0.5, 0.5);
                 left_Arm_Motor.setPower(armLeftPower);
                 right_Arm_Motor.setPower(armRightPower);
+
+                armOverrideActived = true;
+            }
+            else {
+                armOverrideActived = false;
             }
 
 //  T E M E T R Y  D A T A  \\
-            telemetry.addData("ArmLevel : ", level);
-            telemetry.addData("Swivel Left Power:", left_Arm_Motor.getPower());
-            telemetry.addData("Swivel Right Power:", right_Arm_Motor.getPower());
+            telemetry.addData("  <===============>  ", "");
 
-            //get updated encoder positions
-            telemetry.addData("Arm Left Value:",  left_Arm_Motor.getCurrentPosition());
-            telemetry.update();
-            telemetry.addData("Arm Right Value:",  right_Arm_Motor.getCurrentPosition());
+            telemetry.addData("Current Arm Level: ", level);
+            telemetry.addData("Arm Left Encoder Value: ",  left_Arm_Motor.getCurrentPosition());
+            telemetry.addData("Arm Right Encoder Value: ",  right_Arm_Motor.getCurrentPosition());
+
+            telemetry.addData("  ----------  ", "");
+
+            telemetry.addData("Button/Input X is on: ", gamepad2.x);
+            telemetry.addData("Button/Input Y is on: ", gamepad2.y);
+            telemetry.addData("Button/Input B is on: ", gamepad2.b);
+            telemetry.addData("Button/Input A is on: ", gamepad2.a);
+
+            telemetry.addData("  ----------  ", "");
+
+            telemetry.addData("Arm is in override mode: ", armOverrideActived);
+
+            telemetry.addData("  <===============>  ", "");
             telemetry.update();
         }
     }
