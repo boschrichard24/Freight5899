@@ -232,7 +232,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             else if (level > 1) { level --; }
             changedToNewLevel = true;
         }
-        else if (gamepad2.a && changedToNewLevel) {
+        else if (gamepad2.a && !changedToNewLevel) {
             level = 1;
             changedToNewLevel = true;
         }
@@ -241,18 +241,19 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
         // This will check if a new level if asked for and change the encoder modes \\
         // "if the level from one frame ago was not the same... " \\
-        if (prevLevel != level) {
+        if (level != prevLevel) {
             right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             setArmLevel(level);
+            prevLevel = level;
         }
         // "if the level has not changed, turn off motor and motor encoders" \\
         else {
             right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             runArmPower(0.0);
+            prevLevel = level;
         }
-        prevLevel = level;
     }
 
 
@@ -307,11 +308,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 level = 3;
                 changed6 = true;
             }else if(!gamepad2.y){changed6 = false;} */
-
             // This will set a new level when you press the dpad button up and \\
             // will wait until you let go to be able to go to a new level \\
-
-
+            armFunction();
 
 //  C L A W func \\
             if(gamepad2.x && clawPos < clawMax){
@@ -342,7 +341,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 left_Arm_Motor.setPower(armLeftPower);
                 right_Arm_Motor.setPower(armRightPower);
             }
-
 
 //  T E M E T R Y  D A T A  \\
             telemetry.addData("ArmLevel : ", level);
