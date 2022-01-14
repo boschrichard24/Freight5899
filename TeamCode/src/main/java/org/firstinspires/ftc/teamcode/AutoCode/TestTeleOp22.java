@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.AutoCode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
 
-public class CompetitionTeleOp22 extends LinearOpMode {
+@TeleOp(name="TestTeleOp22", group="Linear Opmode")
+public class TestTeleOp22 extends LinearOpMode{
 
 
     // ******************               VARIABLE DEF-S              ******************  \\
@@ -20,18 +20,19 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     private double leftMovePower  = 0.0;
     private double rightMovePower = 0.0;
     private double pivotPower     = 0.0;
-    private double duckyPower     = 0.2;
+    private double duckyPower     = 0.3;
     // Misc. vars
     private double spin         = 0.0;
     private ElapsedTime runtime = new ElapsedTime();
-    private int level = 1;
+
+    private int level = 3;
+    double powerChange = 0.0;
     public RevBlinkinLedDriver lights;
     // Claw vars
     protected Servo claw        = null;  // This is the open and close servo of the claw \\
-    final private double clawMax       = 0.401;
-    final private double clawMin       = 0.601;
+    final private double clawClosed       = 0.363;
+    final private double clawOpen       = 0.611;
     private double clawPos             = 0.0;
-    private double powerChange         = 1.0;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
     protected DcMotor right_Back_Drive  = null;
@@ -49,11 +50,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     boolean changed5 = false;
     boolean changed6 = false;
     boolean changed7 = false;
-
-    boolean changedToNewLevel = false;
-
-    boolean armOverrideActived = false;
-
 
 //    **********     MAIN FUNCTIONS     **********     \\
 
@@ -80,37 +76,39 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         switch (targetLevel) {
             case 1:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                encoderTargets[0] = 0;
-                encoderTargets[1] = 0; // floor level to pick up pieces \\
+                encoderTargets[0] = -597;
+                //sleep(100);
+                encoderTargets[1] = -949; // floor level to pick up pieces \\
                 break;
             case 2:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                encoderTargets[0] = 42;
-                encoderTargets[1] = 213; // level 1 on shipping container \\
+                encoderTargets[0] = -432;
+                encoderTargets[1] = -842; // level 1 on shipping container \\
                 break;
             case 3:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                encoderTargets[0] = 265;
-                encoderTargets[1] = 185; // level 2 on shipping container \\
+                encoderTargets[0] = -300;
+                encoderTargets[1] = -742; // level 2 on shipping container \\
                 break;
             case 4:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
                 //put light code here plug in light into the BLinkin - Blikin plugs inot the servo port - config inside of servo
-                encoderTargets[0] = 440;
-                encoderTargets[1] = 185; // level 3 on shipping container \\
+                encoderTargets[0] = -181;
+                encoderTargets[1] = -609; // level 3 on shipping container \\
                 break;
             case 5:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 594;
-                encoderTargets[1] = 530; // top of shipping container for gamepiece \\
+                encoderTargets[0] = -12;
+                encoderTargets[1] = -587; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = 647;
-                encoderTargets[1] = 592; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = 76;
+                encoderTargets[1] = -448; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
                 //whatever postiion you want for init
             default:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_GRAY);
@@ -122,6 +120,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         runArmPower(.5);
         left_Arm_Motor.setTargetPosition(encoderTargets[0]);
         right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+
     }
 
     public void hardwareSetup()
@@ -153,109 +152,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         telemetry.update();
     }
 
-    public void move()
-    {
-        //  S P E E D   \\
-        leftMovePower = -gamepad1.left_stick_y * powerChange;
-        rightMovePower = -gamepad1.right_stick_y * powerChange;
-        left_Back_Drive.setPower(leftMovePower);
-        right_Back_Drive.setPower(rightMovePower);
-        left_Front_Drive.setPower(leftMovePower);
-        right_Front_Drive.setPower(rightMovePower);
-
-        if(gamepad1.a && !changed1) {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
-            if(powerChange == 0.5 || powerChange == 2) {
-                powerChange = 1;
-            }
-            else {
-                powerChange = 0.5;
-            }
-            changed1 = true;
-        }
-        else if (!gamepad1.a){
-            changed1 = false;
-        }
-
-        if(gamepad1.b && !changed7) {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
-            if(powerChange == 0.5 || powerChange == 2) {
-                powerChange = 1;
-            }
-            else {
-                powerChange = 2;
-            }
-            changed7 = true;
-        }
-        else if (!gamepad1.b){
-            changed7 = false;
-        }
-        //   I N V E R S E   \\
-        if(gamepad1.x && !changed2) {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
-            leftMovePower = gamepad1.left_stick_y;
-            rightMovePower = gamepad1.right_stick_y;
-            changed2 = true;
-        }
-        else if(!gamepad1.x){
-            changed2 = false;
-        }
-    }
-
-    public void pivotArmPower()
-    {
-        if(gamepad1.left_trigger>0.1 && !(gamepad1.right_trigger>0.1)) {
-            spin = gamepad1.left_trigger*0.5;
-            pivot_Arm_Motor.setPower(spin);
-        }
-        else if(gamepad1.right_trigger>0.1 && !(gamepad1.left_trigger>0.1)){
-            spin = -gamepad1.right_trigger*0.5;
-            pivot_Arm_Motor.setPower(spin);
-        }
-        else {
-            pivot_Arm_Motor.setPower(0.0);
-        }
-    }
-
-    public void armFunction()
-    {
-        int prevLevel = level;
-
-        // "if you press up and you're not at the needed higher level..." \\
-        if (gamepad2.dpad_up && !changedToNewLevel) {
-            if (level >= 6) { level = 6; }
-            else if (level < 6) { level ++; }
-            changedToNewLevel = true;
-        }
-        // "if you press down and you're not at the needed lower level..." \\
-        else if (gamepad2.dpad_down && !changedToNewLevel) {
-            if (level <= 1) { level = 1; }
-            else if (level > 1) { level --; }
-            changedToNewLevel = true;
-        }
-        else if (gamepad2.a && !changedToNewLevel) {
-            level = 1;
-            changedToNewLevel = true;
-        }
-        // "if neither buttons pressed, reset the button toggle bool" (allows you to press again) \\
-        else if (!gamepad2.dpad_up && !gamepad2.dpad_down) { changedToNewLevel = false; }
-
-        // This will check if a new level if asked for and change the encoder modes \\
-        // "if the level from one frame ago was not the same... " \\
-        if (level != prevLevel) {
-            right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            setArmLevel(level);
-            prevLevel = level;
-        }
-        // "if the level has not changed, turn off motor and motor encoders" \\
-        else if (level == prevLevel) {
-            right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            runArmPower(0.0);
-            prevLevel = level;
-        }
-    }
 
 
     @Override
@@ -267,19 +163,76 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 //  E N C O D E R S SET up  \\
         resetArmEncoders();
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
 
         while (opModeIsActive()) {
-//  M O V E  func  \\
-            move();
+
+            leftMovePower = -gamepad1.left_stick_y;
+            rightMovePower = -gamepad1.right_stick_y;
+            left_Back_Drive.setPower(leftMovePower);
+            right_Back_Drive.setPower(rightMovePower);
+            left_Front_Drive.setPower(leftMovePower);
+            right_Front_Drive.setPower(rightMovePower);
+
+            if(gamepad1.a && !changed1) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
+                if(powerChange == 0.5 || powerChange == 2.5) {
+                    powerChange = 1;
+                }
+                else {
+                    powerChange = 0.5;
+                }
+                changed1 = true;
+            }
+            else if (!gamepad1.a){
+                changed1 = false;
+            }
+
+            if(gamepad1.b && !changed7) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+                if(powerChange == 0.5 || powerChange == 2.5) {
+                    powerChange = 1;
+                }
+                else {
+                    powerChange = 2.5;
+                }
+                changed7 = true;
+            }
+            else if (!gamepad1.b){
+                changed7 = false;
+            }
+
+            //   I N V E R S E   \\
+            if(gamepad1.x && !changed2) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
+                leftMovePower = gamepad1.left_stick_y;
+                rightMovePower = gamepad1.right_stick_y;
+                changed2 = true;
+            }
+            else if(!gamepad1.x){
+                changed2 = false;
+            }
 
 //  S P I N  func  \\
-            pivotArmPower();
-
+            if(gamepad2.left_trigger>0.2 && !(gamepad1.right_trigger>0.2)) {
+                spin = -gamepad2.left_trigger*0.5;
+                pivot_Arm_Motor.setPower(spin);
+                //pivotPower = Range.clip(spin, 0, 0.5);
+                //pivot_Arm_Motor.setPower(pivotPower);
+            }
+            else if(gamepad2.right_trigger>0 && !(gamepad1.left_trigger>0)){
+                spin = gamepad2.right_trigger*0.5;
+                //pivotPower = Range.clip(spin, 0, 0.5);
+                //pivot_Arm_Motor.setPower(pivotPower);
+                pivot_Arm_Motor.setPower(spin);
+            }
 //  D U C K Y func  \\
-            runtime.reset();
             if (gamepad1.right_bumper && !ducky.isBusy()) {
+                runtime.reset();
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
                 long millis = 2000;
                 runtime.reset();
@@ -288,6 +241,19 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                     duckyPower += 0.001;
                 }
                 ducky.setPower(0);
+                duckyPower = 0.3;
+            }
+
+            if (gamepad1.left_bumper && !ducky.isBusy()) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_BEATS_PER_MINUTE);
+                long millis = 2000;
+                runtime.reset();
+                while (runtime.milliseconds() <= millis) {
+                    ducky.setPower(-duckyPower);
+                    duckyPower += 0.001;
+                }
+                ducky.setPower(0);
+                duckyPower = 0.3;
             }
 
 //  A R M  func  \\
@@ -311,44 +277,27 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 level = 3;
                 changed6 = true;
             }else if(!gamepad2.y){changed6 = false;}
-// This will set a new level when you press the dpad button up and \\
-// will wait until you let go to be able to go to a new level \\
-            armFunction();
+
+            setArmLevel(level);
 
 //  C L A W func \\
-            if(gamepad2.x && clawPos < clawMax){
-                while(clawPos < clawMax) {
-                    clawPos += 0.3;
-                    claw.setPosition(clawPos);
+            if(gamepad2.a && clawPos < clawOpen){
+                while(clawPos < clawOpen) {
+                    clawPos += 0.05;
                 }
+                claw.setPosition(clawPos);
+
             }
-            else if(gamepad2.b && clawPos > clawMin){
-                while(clawPos > clawMin) {
-                    clawPos -= 0.3;
-                    claw.setPosition(clawPos);
+            else if(gamepad2.b && clawPos > clawClosed){
+                while(clawPos > clawClosed) {
+                    clawPos -= 0.05;
                 }
+                claw.setPosition(clawPos);
             }
 
             // ******************               OVERIDE ARM func              ******************  \\
 
-            if(gamepad2.left_trigger>0.5 && gamepad2.right_trigger>0.5){
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_OCEAN_PALETTE);
-                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                double armLeftPower;
-                double armRightPower;
-                double armDriveLeft  = -gamepad2.left_stick_y;
-                double armDriveRight = -gamepad2.right_stick_y;
-                armLeftPower  = Range.clip(armDriveLeft, -0.35, 0.35);
-                armRightPower = Range.clip(armDriveRight, -0.35, 0.35);
-                left_Arm_Motor.setPower(armLeftPower);
-                right_Arm_Motor.setPower(armRightPower);
 
-                armOverrideActived = true;
-            }
-            else {
-                armOverrideActived = false;
-            }
 
 //  T E M E T R Y  D A T A  \\
             telemetry.addData("  <===============>  ", "");
@@ -356,6 +305,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             telemetry.addData("Current Arm Level: ", level);
             telemetry.addData("Arm Left Encoder Value: ",  left_Arm_Motor.getCurrentPosition());
             telemetry.addData("Arm Right Encoder Value: ",  right_Arm_Motor.getCurrentPosition());
+            //telemetry.addData("Pivot Encoder Value: ",  pivot_Arm_Motor.getCurrentPosition());
 
             telemetry.addData("  ----------  ", "");
 
@@ -365,8 +315,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             telemetry.addData("Button/Input A is on: ", gamepad2.a);
 
             telemetry.addData("  ----------  ", "");
-
-            telemetry.addData("Arm is in override mode: ", armOverrideActived);
 
             telemetry.addData("  <===============>  ", "");
             telemetry.update();

@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.AutoCode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -10,32 +11,34 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
-@Disabled
+@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Linear Opmode")
 public class CameraTesting extends LinearOpMode {
 
-    private static final double A_Left = 0;
-    private static final double A_Top = 0; //Fill in with legit values
-    private static final double A_Right = 0;
-    private static final double A_Bottom = 0;
+    private static final double A_Left = 1;
+    private static final double A_Top = 1; //Fill in with legit values
+    private static final double A_Right = 320;
+    private static final double A_Bottom = 480;
 
-    private static final double B_Left = 0;
-    private static final double B_Top = 0; //Fill in with legit values
-    private static final double B_Right = 0;
-    private static final double B_Bottom = 0;
+    private static final double B_Left = 321;
+    private static final double B_Top = 1; //Fill in with legit values
+    private static final double B_Right = 640;
+    private static final double B_Bottom = 480;
 
     private static final double C_Left = 0;
     private static final double C_Top = 0; //Fill in with legit values
     private static final double C_Right = 0;
     private static final double C_Bottom = 0;
 
+    private ElapsedTime runtime = new ElapsedTime();
+
     private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
     private static final String[] LABELS = {
             "Ball",
             "Cube",
-            "Duck",
+            "Ducky",
             "Marker"
     };
 
@@ -80,18 +83,23 @@ public class CameraTesting extends LinearOpMode {
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 Recognition duck = null;
-                while(true){
+                long halfSec = 2000;
+                runtime.reset();
+                while(runtime.milliseconds() <= halfSec){
                     duck = getDuckPosition();
                     if(duck != null){
                         break;
                     }
                 }
-                telemetry.addData(String.format("  left,top (%d)", 1), "%.03f , %.03f",
+                int path = getZone(duck);
+                /*telemetry.addData(String.format("  left,top (%d)", 1), "%.03f , %.03f",
                         duck.getLeft(), duck.getTop());
                 telemetry.addData(String.format("  right,bottom (%d)", 1), "%.03f , %.03f",
                         duck.getRight(), duck.getBottom());
+                telemetry.addData("  int :  (%d)", path);*/
+                telemetry.addLine("Path: " + path);
                 telemetry.update();
-                sleep(10000);
+                sleep(5000);
             }
         }
     }
@@ -144,12 +152,12 @@ public class CameraTesting extends LinearOpMode {
             // the last time that call was made.
             List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
             if (updatedRecognitions != null) {
-                telemetry.addData("# Object Detected", updatedRecognitions.size());
+                //telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                 // step through the list of recognitions and display boundary info.
                 int i = 0;
                 for (Recognition recognition : updatedRecognitions) {
-                    /*telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                   /* telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                     telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
                             recognition.getLeft(), recognition.getTop());
                     telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
@@ -159,9 +167,25 @@ public class CameraTesting extends LinearOpMode {
                     }
                     i++;
                 }
-                telemetry.update();
+                //telemetry.update();
             }
         }
         return null;
+    }
+
+    public int getZone(Recognition ducky){
+        if(ducky == null){
+            return 3;
+        }
+        double avgPosition = (ducky.getLeft() + ducky.getRight()) / 2;
+        if(avgPosition >= A_Left && avgPosition <= A_Right){
+            return 1;
+        }
+        else if(avgPosition >= B_Left && avgPosition <= B_Right){
+            return 2;
+        }
+        else{
+            return -1;
+        }
     }
 }

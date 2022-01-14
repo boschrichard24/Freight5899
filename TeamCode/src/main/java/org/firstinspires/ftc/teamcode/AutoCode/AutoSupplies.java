@@ -1,13 +1,20 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.AutoCode;
 
 //imports
 
-
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.Servo;
+
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -26,7 +33,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected DcMotor right_Arm_Motor = null;
     protected DcMotor pivot_Arm_Motor = null;
 
-    protected Servo claw_Servo = null;  // This is the open and close servo of the claw \\
+    protected Servo claw = null;  // This is the open and close servo of the claw \\
     protected DcMotor ducky = null;
 
     // For the claw servo \\
@@ -134,7 +141,7 @@ public abstract class AutoSupplies extends LinearOpMode{
         else if (!open && newPosition > minAngle) {
             newPosition -= increment;
         }
-        claw_Servo.setPosition(newPosition);
+        claw.setPosition(newPosition);
     }
 
     public void resetArmEncoders()
