@@ -4,8 +4,10 @@ package org.firstinspires.ftc.teamcode.AutoCode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -28,10 +30,18 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected DcMotor right_Back_Drive = null;
     protected DcMotor left_Front_Drive = null;
     protected DcMotor right_Front_Drive = null;
-
+    protected BNO055IMU imu;
     protected DcMotor left_Arm_Motor = null;
     protected DcMotor right_Arm_Motor = null;
     protected DcMotor pivot_Arm_Motor = null;
+    protected ElapsedTime runtime = new ElapsedTime();
+
+    //  Protected variables
+    protected double globalAngle;
+    protected double globalPitch;
+    protected Orientation lastAngles = new Orientation();
+    protected Orientation lastPitches = new Orientation();
+
 
     protected Servo claw = null;  // This is the open and close servo of the claw \\
     protected DcMotor ducky = null;
@@ -40,9 +50,6 @@ public abstract class AutoSupplies extends LinearOpMode{
     double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
     double rArmMotorEncoderTarget = 0.0; // Tilt of entire arm
 
-    //  Declare OpMode Members
-    protected ElapsedTime runtime = new ElapsedTime();
-    abstract public void runOpMode() throws InterruptedException;
 
     //---callable methods---\\
 
@@ -52,97 +59,201 @@ public abstract class AutoSupplies extends LinearOpMode{
     }*/
 
     //move
-    public void move(double leftPower, double rightPower)
-    {
-        //sets the power of the motors
-        left_Back_Drive.setPower(leftPower);
-        left_Front_Drive.setPower(leftPower);
-        right_Back_Drive.setPower(rightPower);
-        right_Front_Drive.setPower(rightPower);
+    public void move(long millis, double lp, double rp) {
+        double leftPower = lp;
+        double rightPower = rp;
+        runtime.reset();
+        while (opModeIsActive() && runtime.milliseconds() <= millis) {
+            left_Back_Drive.setPower(leftPower);
+            left_Front_Drive.setPower(leftPower);
+            right_Back_Drive.setPower(rightPower);
+            right_Front_Drive.setPower(rightPower);
+        }
+        left_Back_Drive.setPower(0);
+        left_Front_Drive.setPower(0);
+        right_Back_Drive.setPower(0);
+        right_Front_Drive.setPower(0);
     }
 
-    // This is only for arm tests but maybe not actually i dont know :|
-    public void setArmPowers(double mainMotor, double innerAngleMotor, double pivotMotor)
-    {
-        left_Arm_Motor.setPower(innerAngleMotor);
-        right_Arm_Motor.setPower(mainMotor);
-        pivot_Arm_Motor.setPower(pivotMotor);
-    }
 
-    public void setArmLevel(int targetLevel, int lastLevel)
-    {
-        if (left_Arm_Motor.isBusy() || right_Arm_Motor.isBusy()) {
+    //Using the gyroscope, when a degree is passed both left and right motors move accordingly in
+    //order to turn the robot to the right or left until the bearing is equal to or greater than the
+    //specified degree. Power can also be specified.
+    //used commonly in pairs(one fast for speed and one slow for accuracy) to improve movement time.
+    public void turnToS(int degrees, double power, int loopnum){
+        int left  = 1;
+        int right = 1;
+        double distance = getAngle() - degrees;
+        double startAngle = getAngle();
+        telemetry.addData("Angle3",getAngle());
+        telemetry.update();
+        if(getAngle() <= degrees){
+            left *= -1;
+        }
+        else if(getAngle() > degrees){
+            right *= -1;
+        }
 
-            //resetArmEncoders();  <==  Do this in setup     \\
-            int[] encoderTargets = new int[2];
+        left_Back_Drive.setPower(power * left);
+        left_Front_Drive.setPower(power * left);
+        right_Front_Drive.setPower(power * right);
+        right_Back_Drive.setPower(power* right);
 
-            switch (targetLevel) {
-                case 1:
-                    encoderTargets[0] = 1000;
-                    encoderTargets[1] = 0; // floor level to pick up pieces \\
-                    break;
-                case 2:
-                    encoderTargets[0] = 1100;
-                    encoderTargets[1] = 0; // level 1 on shipping container \\
-                    break;
-                case 3:
-                    encoderTargets[0] = 1100;
-                    encoderTargets[1] = 400; // level 2 on shipping container \\
-                    break;
-                case 4:
-                    encoderTargets[0] = 1000;
-                    encoderTargets[1] = 800; // level 3 on shipping container \\
-                    break;
-                case 5:
-                    encoderTargets[0] = 1300;
-                    encoderTargets[1] = 1000; // top of shipping container for gamepiece \\
-                    break;
-                case 6:
-                    encoderTargets[0] = 1500;
-                    encoderTargets[1] = 1000; // high as possible (Caed.. we need this?? :\ ) \\
-                    break;
-                default:
-                    encoderTargets[0] = 1000;
-                    encoderTargets[1] = 0; // Default is bottom (level 1) \\
-                    break;
+        if (getAngle() > degrees)
+        {
+            // On left turn we have to get off zero first.
+            while (opModeIsActive() && getAngle() >= degrees) {
+                //telemetry.addData("Angle4",getAngle());
+                //telemetry.update();
+                if((startAngle + ((distance/4)*3)) > getAngle()){
+                    left *= 1.05;
+                    right *= 1.05;
+                }
+                else{
+                    if(left > 1 || left < -1 || right > 1 || right < -1){
+                        left*=0.95;
+                        right*=0.95;
+                    }
+                }
             }
-            if (targetLevel > lastLevel) {
-                // "Don't change the values" \\
-            } else if (targetLevel < lastLevel) {
-                encoderTargets[0] *= -1;
-                encoderTargets[0] *= -1;
-            } else {
+        }
+        else {    // right turn.
+            while (opModeIsActive() && getAngle() <= degrees) {
+                //telemetry.addData("Angle4", getAngle());
+                //telemetry.update();
+                if((startAngle + ((distance/4)*3)) > getAngle()){
+                    left *= 1.05;
+                    right *= 1.05;
+                }
+                else{
+                    if(left > 1 || left < -1 || right > 1 || right < -1){
+                        left*=0.95;
+                        right*=0.95;
+                    }
+                }
+            }
+        }
+        // turn the motors off.
+        left_Front_Drive.setPower(0);
+        left_Back_Drive.setPower(0);
+        right_Back_Drive.setPower(0);
+        right_Front_Drive.setPower(0);
+        if(--loopnum > 0){
+            turnToS(degrees, power/2, loopnum);
+        }
+    }
+
+
+    //uses the imu to find the current angle
+    public double getAngle()
+    {
+        // We experimentally determined the Z axis is the axis we want to use for heading angle.
+        // We have to process the angle because the imu works in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+
+
+    public void setArmLevel(int targetLevel)
+    {
+        int[] encoderTargets = new int[2];
+
+        switch (targetLevel) {
+            case 1:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                encoderTargets[0] = -597;
+                //sleep(100);
+                encoderTargets[1] = -949; // floor level to pick up pieces \\
+                break;
+            case 2:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
+                encoderTargets[0] = -432;
+                encoderTargets[1] = -842; // level 1 on shipping container \\
+                break;
+            case 3:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
+                encoderTargets[0] = -300;
+                encoderTargets[1] = -742; // level 2 on shipping container \\
+                break;
+            case 4:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+                encoderTargets[0] = -181;
+                encoderTargets[1] = -609; // level 3 on shipping container \\
+                break;
+            case 5:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
+                encoderTargets[0] = -12;
+                encoderTargets[1] = -587; // top of shipping container for gamepiece \\
+                break;
+            case 6:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+                encoderTargets[0] = 76;
+                encoderTargets[1] = -448; // high as possible (Caed.. we need this?? :\ ) \\
+                break;
+            case 7:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+
+                //whatever postiion you want for init
+            default:
+                //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_GRAY);
                 encoderTargets[0] = 0;
-                encoderTargets[1] = 0; // The levels are the same as previous but the function was called \\
+                encoderTargets[1] = 0; // Default is bottom (level 1) \\
+                break;
+        }
+
+        runArmPower(.5);
+        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+    }
+
+
+
+    public void runArmPower(double power)
+    {
+        left_Arm_Motor.setPower(power);
+        right_Arm_Motor.setPower(power);
+    }
+
+
+
+    public void toggleClaw()
+    {
+        double clawClosed = 0.363;
+        double clawOpen = 0.611;
+        double clawPos = 0.0;
+
+        if(clawPos < clawOpen){
+            while(clawPos < clawOpen) {
+                clawPos += 0.05;
             }
+            claw.setPosition(clawPos);
 
-            // Reset the previous level that the robot was at and set the target encoder values \\
-            lastLevel = targetLevel;
-
-            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        }
+        else if(clawPos > clawClosed){
+            while(clawPos > clawClosed) {
+                clawPos -= 0.05;
+            }
+            claw.setPosition(clawPos);
         }
     }
 
-    public void setArmPosition(double power)
-    {
-        // "While both motors are busy reaching their encoder targets..." \\
-        while (right_Arm_Motor.isBusy() || left_Arm_Motor.isBusy()) {
-            left_Arm_Motor.setPower(power);
-            right_Arm_Motor.setPower(power);
-        }
-    }
 
-    public void toggleClaw(double increment, double minAngle, double maxAngle, boolean open, double newPosition)
-    {
-        if (open && newPosition < maxAngle) {
-            newPosition += increment;
-        }
-        else if (!open && newPosition > minAngle) {
-            newPosition -= increment;
-        }
-        claw.setPosition(newPosition);
-    }
 
     public void resetArmEncoders()
     {
@@ -155,6 +266,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
+
+
     public void setArmEncoderMode()
     {
         // Set the mode of the encoders to RUN_TO_POSITION \\
@@ -163,14 +276,100 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void duckyMotorPower(double power)
+
+
+    public void duckyMotorPower(char let)
     {
-        ducky.setPower(power);
+        double duckyPower = 0.3;
+
+        if (let == 'B') {
+            runtime.reset();
+            long millis = 2000;
+            runtime.reset();
+            while (runtime.milliseconds() <= millis) {
+                ducky.setPower(duckyPower);
+                duckyPower += 0.001;
+            }
+            ducky.setPower(0);
+            duckyPower = 0.3;
+        }
+
+        if (let == 'R') {
+            long millis = 2000;
+            runtime.reset();
+            while (runtime.milliseconds() <= millis) {
+                ducky.setPower(-duckyPower);
+                duckyPower += 0.001;
+            }
+            ducky.setPower(0);
+            duckyPower = 0.3;
+        }
     }
+
+
 
     public void initForAutonomous()
     {
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        BNO055IMU.Parameters gyroParameters = new BNO055IMU.Parameters();
 
+        gyroParameters.mode                = BNO055IMU.SensorMode.IMU;
+        gyroParameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        gyroParameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        gyroParameters.loggingEnabled      = false;
+
+// Connect Motors to Phone \\
+        left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
+        left_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
+        right_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
+        left_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
+        right_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+        ducky.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        claw = hardwareMap.get(Servo.class, "claw");
+        //lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
+
+// Set the direction for each of the motors \\
+        left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
+        left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
+        right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        left_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        //initializes imu and calibrates it. Prepares lift motor to land using the encoder
+        // Lights turn green when it is calibrated
+        telemetry.addData("Mode", "calibrating...");
+        telemetry.update();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(gyroParameters);
+
+        telemetry.clear();
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     public void test()
@@ -185,6 +384,27 @@ public abstract class AutoSupplies extends LinearOpMode{
 /*package org.firstinspires.ftc.teamcode;
 
 //imports
+
+
+
+
+    // This is only for arm tests but maybe not actually i dont know :|
+    public void setArmPowers(double mainMotor, double innerAngleMotor, double pivotMotor)
+    {
+        left_Arm_Motor.setPower(innerAngleMotor);
+        right_Arm_Motor.setPower(mainMotor);
+        pivot_Arm_Motor.setPower(pivotMotor);
+    }
+
+
+    public void setArmPosition(double power)
+    {
+        // "While both motors are busy reaching their encoder targets..." \\
+        while (right_Arm_Motor.isBusy() || left_Arm_Motor.isBusy()) {
+            left_Arm_Motor.setPower(power);
+            right_Arm_Motor.setPower(power);
+        }
+    }
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;

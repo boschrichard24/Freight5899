@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.AutoCode;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -10,38 +10,40 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name="TestTeleOp22", group="Linear Opmode")
-public class TestTeleOp22 extends LinearOpMode{
+@TeleOp(name="OverrideTestOp22", group="Linear Opmode")
+public class OverrideTestOp22 extends LinearOpMode{
 
 
-    // ****************** VARIABLE DEF-S ****************** \\
+    // ******************               VARIABLE DEF-S              ******************  \\
 
     // Power vars
-    private double leftMovePower = 0.0;
+    private double leftMovePower  = 0.0;
     private double rightMovePower = 0.0;
-    private double pivotPower = 0.0;
-    private double duckyPower = 0.3;
+    private double pivotPower     = 0.0;
+    private double duckyPower     = 0.3;
     // Misc. vars
-    private double spin = 0.0;
+    private double spin         = 0.0;
+    private double armLeftPower         = 0.0;
+    private double armRightPower        = 0.0;
     private ElapsedTime runtime = new ElapsedTime();
 
     private int level = 3;
     double powerChange = 0.0;
     public RevBlinkinLedDriver lights;
     // Claw vars
-    protected Servo claw = null; // This is the open and close servo of the claw \\
-    final private double clawClosed = 0.363;
-    final private double clawOpen = 0.611;
-    private double clawPos = 0.0;
+    protected Servo claw        = null;  // This is the open and close servo of the claw \\
+    final private double clawClosed       = 0.363;
+    final private double clawOpen       = 0.611;
+    private double clawPos             = 0.0;
     // Motors vars
-    protected DcMotor left_Back_Drive = null;
-    protected DcMotor right_Back_Drive = null;
-    protected DcMotor left_Front_Drive = null;
+    protected DcMotor left_Back_Drive   = null;
+    protected DcMotor right_Back_Drive  = null;
+    protected DcMotor left_Front_Drive  = null;
     protected DcMotor right_Front_Drive = null;
-    protected DcMotor left_Arm_Motor = null;
-    protected DcMotor right_Arm_Motor = null;
-    protected DcMotor pivot_Arm_Motor = null;
-    protected DcMotor ducky = null;
+    protected DcMotor left_Arm_Motor    = null;
+    protected DcMotor right_Arm_Motor   = null;
+    protected DcMotor pivot_Arm_Motor   = null;
+    protected DcMotor ducky             = null;
     // Button Booleans
     boolean changed1 = false;
     boolean changed2 = false;
@@ -51,7 +53,7 @@ public class TestTeleOp22 extends LinearOpMode{
     boolean changed6 = false;
     boolean changed7 = false;
 
-// ********** MAIN FUNCTIONS ********** \\
+//    **********     MAIN FUNCTIONS     **********     \\
 
 
     public void resetArmEncoders()
@@ -125,7 +127,7 @@ public class TestTeleOp22 extends LinearOpMode{
 
     public void hardwareSetup()
     {
-        // Connect Motors to Phone \\
+        //  Connect Motors to Phone  \\
         left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
         right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
         left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
@@ -138,7 +140,7 @@ public class TestTeleOp22 extends LinearOpMode{
         claw = hardwareMap.get(Servo.class, "claw");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
-// Set the direction for each of the motors \\
+//  Set the direction for each of the motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
         left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -161,7 +163,7 @@ public class TestTeleOp22 extends LinearOpMode{
 
         waitForStart();
 
-// E N C O D E R S SET up \\
+//  E N C O D E R S SET up  \\
         resetArmEncoders();
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -206,7 +208,7 @@ public class TestTeleOp22 extends LinearOpMode{
                 changed7 = false;
             }
 
-            // I N V E R S E \\
+            //   I N V E R S E   \\
             if(gamepad1.x && !changed2) {
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
                 leftMovePower = gamepad1.left_stick_y;
@@ -217,7 +219,7 @@ public class TestTeleOp22 extends LinearOpMode{
                 changed2 = false;
             }
 
-// S P I N func \\
+//  S P I N  func  \\
             if(gamepad2.left_trigger>0.2 && !(gamepad2.right_trigger>0.2)) {
                 spin = -gamepad2.left_trigger*0.5;
                 pivot_Arm_Motor.setPower(spin);
@@ -230,7 +232,7 @@ public class TestTeleOp22 extends LinearOpMode{
                 //pivot_Arm_Motor.setPower(pivotPower);
                 pivot_Arm_Motor.setPower(spin);
             }
-// D U C K Y func \\
+//  D U C K Y func  \\
             if (gamepad1.right_bumper && !ducky.isBusy()) {
                 runtime.reset();
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
@@ -256,7 +258,7 @@ public class TestTeleOp22 extends LinearOpMode{
                 duckyPower = 0.3;
             }
 
-// A R M func \\
+//  A R M  func  \\
             if(gamepad2.dpad_up && !changed3){
                 if(level == 7){level = 0;}
                 level ++;
@@ -280,7 +282,7 @@ public class TestTeleOp22 extends LinearOpMode{
 
             setArmLevel(level);
 
-// C L A W func \\
+//  C L A W func \\
             if(gamepad2.a && clawPos < clawOpen){
                 while(clawPos < clawOpen) {
                     clawPos += 0.05;
@@ -295,29 +297,47 @@ public class TestTeleOp22 extends LinearOpMode{
                 claw.setPosition(clawPos);
             }
 
-            // ****************** OVERIDE ARM func ****************** \\
+            // ******************               OVERIDE ARM func              ******************  \\
+            if(gamepad2.right_bumper && gamepad2.left_bumper) {
+                resetArmEncoders();
+                armLeftPower = -gamepad2.left_trigger*0.5;
+                left_Arm_Motor.setPower(armLeftPower);
+                //pivotPower = Range.clip(spin, 0, 0.5);
+                //pivot_Arm_Motor.setPower(pivotPower);
+                armRightPower =  -gamepad2.right_trigger*0.5;
+                right_Arm_Motor.setPower(armRightPower);
+
+            }
+            else if(gamepad2.right_trigger>0 && !(gamepad2.left_trigger>0)){
+                resetArmEncoders();
+                spin = gamepad2.right_trigger*0.5;
+                //pivotPower = Range.clip(spin, 0, 0.5);
+                //pivot_Arm_Motor.setPower(pivotPower);
+                pivot_Arm_Motor.setPower(spin);
+            }
 
 
-
-// T E M E T R Y D A T A \\
-            telemetry.addData(" <===============> ", "");
+//  T E M E T R Y  D A T A  \\
+            telemetry.addData("  <===============>  ", "");
 
             telemetry.addData("Current Arm Level: ", level);
-            telemetry.addData("Arm Left Encoder Value: ", left_Arm_Motor.getCurrentPosition());
-            telemetry.addData("Arm Right Encoder Value: ", right_Arm_Motor.getCurrentPosition());
-            //telemetry.addData("Pivot Encoder Value: ", pivot_Arm_Motor.getCurrentPosition());
+            telemetry.addData("Arm Left Encoder Value: ",  left_Arm_Motor.getCurrentPosition());
+            telemetry.addData("Arm Right Encoder Value: ",  right_Arm_Motor.getCurrentPosition());
+            //telemetry.addData("Pivot Encoder Value: ",  pivot_Arm_Motor.getCurrentPosition());
 
-            telemetry.addData(" ---------- ", "");
+            telemetry.addData("  ----------  ", "");
 
             telemetry.addData("Button/Input X is on: ", gamepad2.x);
             telemetry.addData("Button/Input Y is on: ", gamepad2.y);
             telemetry.addData("Button/Input B is on: ", gamepad2.b);
             telemetry.addData("Button/Input A is on: ", gamepad2.a);
 
-            telemetry.addData(" ---------- ", "");
+            telemetry.addData("  ----------  ", "");
 
-            telemetry.addData(" <===============> ", "");
+            telemetry.addData("  <===============>  ", "");
             telemetry.update();
         }
     }
 }
+
+
