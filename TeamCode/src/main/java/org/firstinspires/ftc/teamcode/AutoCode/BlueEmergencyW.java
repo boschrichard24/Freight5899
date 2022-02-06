@@ -13,16 +13,16 @@ import org.firstinspires.ftc.teamcode.AutoCode.AutoSupplies;
 //webcam imports
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-@Autonomous(name="Red Emergaency Auto", group="CompetitionAuto")
+@Autonomous(name="BlueEmergency Auto", group="CompetitionAuto")
 //@Disabled
-public class RedEmergaency extends AutoSupplies {
+public class BlueEmergencyW extends AutoSupplies {
     @Override
     public void runOpMode() {
 
         //  Establish all hardware
         initForAutonomous();
         //  Wait until start
-        //waitForStart();
+        waitForStart();
         initVision();
 
         /** Wait for the game to begin */
@@ -33,7 +33,7 @@ public class RedEmergaency extends AutoSupplies {
         int path = 0;
 
         Recognition duck = null;
-        long halfSec = 500;
+        long halfSec = 2000;
         runtime.reset();
         while (runtime.milliseconds() <= halfSec) {
             duck = getDuckPosition();
@@ -45,7 +45,7 @@ public class RedEmergaency extends AutoSupplies {
         telemetry.addLine("Path: " + path);
         telemetry.update();
 
-        //sleep(300);
+        sleep(300);
         if (path == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
         } else if (path == 2) {

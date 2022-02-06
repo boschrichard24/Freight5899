@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -23,6 +25,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 public abstract class AutoSupplies extends LinearOpMode{
     // Motors, servos, etc.
@@ -42,7 +49,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected Orientation lastAngles = new Orientation();
     protected Orientation lastPitches = new Orientation();
 
-
+    protected RevBlinkinLedDriver lights;
     protected Servo claw = null;  // This is the open and close servo of the claw \\
     protected DcMotor ducky = null;
 
@@ -50,13 +57,49 @@ public abstract class AutoSupplies extends LinearOpMode{
     double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
     double rArmMotorEncoderTarget = 0.0; // Tilt of entire arm
 
-
+    //Encoder Values
+    //Neverest 40 motor spec: quadrature encoder, 7 pulses per revolution, count = 7 * 40
+    private static final double COUNTS_PER_MOTOR_REV = 420; // Neverest 40 motor encoder - orginal val = 280
+    private static final double DRIVE_GEAR_REDUCTION = 1; // This is < 1 if geared up
+    private static final double COUNTS_PER_DEGREE1 = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / 360;
     //---callable methods---\\
 
     /*public void setup()
     {
         resetArmEncoders();
     }*/
+
+    private static final double A_Left = 1;
+    private static final double A_Top = 1; //Fill in with legit values
+    private static final double A_Right = 320;
+    private static final double A_Bottom = 480;
+
+    private static final double B_Left = 321;
+    private static final double B_Top = 1; //Fill in with legit values
+    private static final double B_Right = 640;
+    private static final double B_Bottom = 480;
+
+    private static final double C_Left = 0;
+    private static final double C_Top = 0; //Fill in with legit values
+    private static final double C_Right = 0;
+    private static final double C_Bottom = 0;
+
+
+    private static final String TFOD_MODEL_ASSET = "FreightFrenzy_BCDM.tflite";
+    private static final String[] LABELS = {
+            "Ball",
+            "Cube",
+            "Ducky",
+            "Marker"
+    };
+
+
+    private static final String VUFORIA_KEY =
+            "Ac8qVVb/////AAABmW0ZY5qaKUVegMYq2LOSDO1OzcyAP6IoQTVXJ5E6V+Xier9dD5quzzS0toHeXCyiWZn6Wsw2WdgS9GLwIjNfmuozNwBTuU9DBkABBpyBwAXiiZmzTgLLkNR1dw9+Vwl/S76TuqcaNHTl8vvQOTssFkIvXC0f5acepwlTL8xjEsvb3Y6Fys/mMQprOuhg/9f44K5DsQwutOaTrsVjGyJ1fWyT6cDM+BPqLcBs+/oisbHud/8Q8Iz3I/9+xXJW1ZChn659VoZ0a2Sdoa5FdLl72OpVEzA+d+lYaGcZXmE8NszlxxdOivvNkcFfF45zRyqisSfGowjpyFglNBSWTsNiD1shkpP0uyoeK9lRVxIE4Qug";
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+
+
 
     //move
     public void move(long millis, double lp, double rp) {
@@ -73,6 +116,67 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Front_Drive.setPower(0);
         right_Back_Drive.setPower(0);
         right_Front_Drive.setPower(0);
+    }
+
+    public void encoderMove(double degrees, double lp, double rp){
+        resetDriveEncoders();
+        double counts = degrees * COUNTS_PER_DEGREE1;
+
+        double leftFrontPower = lp;
+        double rightFrontPower = rp;
+        double leftBackPower = lp;
+        double rightBackPower = rp;
+        double maxPower;
+        double max = 1.0;
+        double posPower = 0.2;
+        maxPower = Math.abs(leftFrontPower);
+        if (Math.abs(rightFrontPower) > maxPower) {
+            maxPower = Math.abs(rightFrontPower);
+        }
+        if (Math.abs(leftBackPower) > maxPower) {
+            maxPower = Math.abs(leftBackPower);
+        }
+        if (Math.abs(rightBackPower) > maxPower) {
+            maxPower = Math.abs(rightBackPower);
+        }
+        if (maxPower > 1) {
+            leftFrontPower = leftFrontPower / maxPower;
+            rightFrontPower = rightFrontPower / maxPower;
+            leftBackPower = leftBackPower / maxPower;
+            rightBackPower = rightBackPower / maxPower;
+
+        }
+        //sets the power of the motors
+        double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                + Math.abs(right_Front_Drive.getCurrentPosition())
+                + Math.abs(left_Back_Drive.getCurrentPosition())
+                + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+        while (opModeIsActive() && averageEnc <= counts){
+            averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                    + Math.abs(right_Front_Drive.getCurrentPosition())
+                    + Math.abs(left_Back_Drive.getCurrentPosition())
+                    + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+            if(posPower < 1 && averageEnc/counts < .6){
+                posPower *= 1.1;
+            }
+            else if(posPower >= 1 && averageEnc/counts <.6){
+                posPower = 1;
+            }
+            else if(averageEnc/counts >= .6 && posPower >= .25){
+                posPower *= .99;
+            }
+            else{
+                posPower = .25;
+            }
+            left_Front_Drive.setPower(leftFrontPower*max*posPower);
+            left_Back_Drive.setPower(leftBackPower*max*posPower);
+            right_Front_Drive.setPower(rightFrontPower*max*posPower);
+            right_Back_Drive.setPower(rightBackPower*max*posPower);
+        }
+        left_Front_Drive.setPower(0);
+        left_Back_Drive.setPower(0);
+        right_Front_Drive.setPower(0);
+        right_Back_Drive.setPower(0);
     }
 
 
@@ -144,31 +248,6 @@ public abstract class AutoSupplies extends LinearOpMode{
     }
 
 
-    //uses the imu to find the current angle
-    public double getAngle()
-    {
-        // We experimentally determined the Z axis is the axis we want to use for heading angle.
-        // We have to process the angle because the imu works in euler angles so the Z axis is
-        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
-        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
-
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
-
-        globalAngle += deltaAngle;
-
-        lastAngles = angles;
-
-        return globalAngle;
-    }
-
-
 
     public void setArmLevel(int targetLevel)
     {
@@ -222,7 +301,29 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Arm_Motor.setTargetPosition(encoderTargets[1]);
     }
 
+    public void resetDriveEncoders(){
+        left_Front_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Back_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Front_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Back_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
 
+    public void setDrivePower(double lp, double rp)
+    {
+        double leftFrontPower = lp;
+        double rightFrontPower = rp;
+        double leftBackPower = lp;
+        double rightBackPower = rp;
+
+        left_Front_Drive.setPower(leftFrontPower);
+        right_Front_Drive.setPower(rightFrontPower);
+        left_Back_Drive.setPower(leftBackPower);
+        right_Back_Drive.setPower(rightBackPower);
+    }
 
     public void runArmPower(double power)
     {
@@ -230,29 +331,17 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Arm_Motor.setPower(power);
     }
 
-
-
-    public void toggleClaw()
+    public void runPivotPower(double power)
     {
-        double clawClosed = 0.363;
-        double clawOpen = 0.611;
-        double clawPos = 0.0;
-
-        if(clawPos < clawOpen){
-            while(clawPos < clawOpen) {
-                clawPos += 0.05;
-            }
-            claw.setPosition(clawPos);
-
-        }
-        else if(clawPos > clawClosed){
-            while(clawPos > clawClosed) {
-                clawPos -= 0.05;
-            }
-            claw.setPosition(clawPos);
-        }
+        pivot_Arm_Motor.setPower(power);
     }
 
+    public void clawOpen(){
+        claw.setPosition(0.611);
+    }
+    public void clawClosed(){
+        claw.setPosition(0.363);
+    }
 
 
     public void resetArmEncoders()
@@ -262,10 +351,13 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         right_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void resetPivotEncoders()
+    {
         pivot_Arm_Motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-
 
 
     public void setArmEncoderMode()
@@ -273,25 +365,33 @@ public abstract class AutoSupplies extends LinearOpMode{
         // Set the mode of the encoders to RUN_TO_POSITION \\
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void setPivotEncoderMode()
+    {
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
 
 
+
     public void duckyMotorPower(char let)
     {
-        double duckyPower = 0.3;
+        double duckyPower = 0.7;
 
         if (let == 'B') {
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
+            long millis = 1000;
             runtime.reset();
-            long millis = 2000;
-            runtime.reset();
-            while (runtime.milliseconds() <= millis) {
+            while(runtime.milliseconds() <= millis){
                 ducky.setPower(duckyPower);
-                duckyPower += 0.001;
+            }
+            millis = 800;
+            runtime.reset();
+            while(runtime.milliseconds() <= millis){
+                ducky.setPower(duckyPower+1.5);
             }
             ducky.setPower(0);
-            duckyPower = 0.3;
         }
 
         if (let == 'R') {
@@ -306,346 +406,6 @@ public abstract class AutoSupplies extends LinearOpMode{
         }
     }
 
-
-
-    public void initForAutonomous()
-    {
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "imu".
-        BNO055IMU.Parameters gyroParameters = new BNO055IMU.Parameters();
-
-        gyroParameters.mode                = BNO055IMU.SensorMode.IMU;
-        gyroParameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        gyroParameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        gyroParameters.loggingEnabled      = false;
-
-// Connect Motors to Phone \\
-        left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
-        left_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
-        right_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
-        left_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
-        right_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
-        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
-        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
-        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        ducky = hardwareMap.get(DcMotor.class, "ducky");
-        ducky.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-        claw = hardwareMap.get(Servo.class, "claw");
-        //lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
-
-// Set the direction for each of the motors \\
-        left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
-        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
-        left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
-        right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
-        right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
-        pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
-        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        left_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        //initializes imu and calibrates it. Prepares lift motor to land using the encoder
-        // Lights turn green when it is calibrated
-        telemetry.addData("Mode", "calibrating...");
-        telemetry.update();
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(gyroParameters);
-
-        telemetry.clear();
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-    }
-
-    public void test()
-    {
-        //telemetry.update();
-    }
-}
-
-
-
-//  -=={###    OLD AUTOSUPPLIES FOR REFERENCE    ###}==-  \\
-/*package org.firstinspires.ftc.teamcode;
-
-//imports
-
-
-
-
-    // This is only for arm tests but maybe not actually i dont know :|
-    public void setArmPowers(double mainMotor, double innerAngleMotor, double pivotMotor)
-    {
-        left_Arm_Motor.setPower(innerAngleMotor);
-        right_Arm_Motor.setPower(mainMotor);
-        pivot_Arm_Motor.setPower(pivotMotor);
-    }
-
-
-    public void setArmPosition(double power)
-    {
-        // "While both motors are busy reaching their encoder targets..." \\
-        while (right_Arm_Motor.isBusy() || left_Arm_Motor.isBusy()) {
-            left_Arm_Motor.setPower(power);
-            right_Arm_Motor.setPower(power);
-        }
-    }
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
-//import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
-//import org.openftc.easyopencv.OpenCvCamera;
-//import org.openftc.easyopencv.OpenCvCameraRotation;
-//import org.openftc.easyopencv.OpenCvInternalCamera;
-//import com.disnodeteam.dogecv.detectors.skystone.SkystoneDetector;
-//import org.openftc.easyopencv.OpenCvCamera;
-//import org.openftc.easyopencv.OpenCvCameraRotation;
-//import org.openftc.easyopencv.OpenCvInternalCamera;
-
-
-public abstract class AutoSupplies extends LinearOpMode{
-    //  Establish hardware
-    protected DcMotor  motorFwdLeft   = null;
-    protected DcMotor  motorFwdRight  = null;
-    protected DcMotor  motorBackLeft  = null;
-    protected DcMotor  motorBackRight = null;
-    protected BNO055IMU imu;
-    protected Rev2mDistanceSensor distanceFwdLeft = null;
-    protected Rev2mDistanceSensor distanceFwdRight = null;
-
-
-    //  Declare OpMode Members
-    protected ElapsedTime runtime = new ElapsedTime();
-    abstract public void runOpMode() throws InterruptedException;
-
-    //  Protected variables
-    protected double globalAngle;
-    protected double globalPitch;
-    protected Orientation lastAngles = new Orientation();
-    protected Orientation lastPitches = new Orientation();
-
-    //---callable methods---
-
-    //move
-    public void move(long millis, double x, double y)
-    {
-        double fwdBackPower = y;
-        double strafePower = x;
-        double leftFrontPower = fwdBackPower + strafePower;
-        double rightFrontPower = fwdBackPower - strafePower;
-        double leftBackPower = fwdBackPower - strafePower;
-        double rightBackPower = fwdBackPower + strafePower;
-        double maxPower;
-        double max = 1.0;
-
-        maxPower = Math.abs(leftFrontPower);
-        if (Math.abs(rightFrontPower) > maxPower) {
-            maxPower = Math.abs(rightFrontPower);
-        }
-        if (Math.abs(leftBackPower) > maxPower) {
-            maxPower = Math.abs(leftBackPower);
-        }
-        if (Math.abs(rightBackPower) > maxPower) {
-            maxPower = Math.abs(rightBackPower);
-        }
-        if (maxPower > 1) {
-            leftFrontPower = leftFrontPower / maxPower;
-            rightFrontPower = rightFrontPower / maxPower;
-            leftBackPower = leftBackPower / maxPower;
-            rightBackPower = rightBackPower / maxPower;
-
-        }
-        //sets the power of the motors
-        runtime.reset();
-        while (opModeIsActive() && runtime.milliseconds() <= millis) {
-            motorFwdLeft.setPower(leftFrontPower*max);
-            motorFwdRight.setPower(rightFrontPower*max);
-            motorBackLeft.setPower(leftBackPower*max);
-            motorBackRight.setPower(rightBackPower*max);
-        }
-        motorFwdLeft.setPower(0);
-        motorFwdRight.setPower(0);
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(0);
-    }
-    public void setPower(double x, double y)
-    {
-        double fwdBackPower = y;
-        double strafePower = x;
-        double leftFrontPower = fwdBackPower + strafePower;
-        double rightFrontPower = fwdBackPower - strafePower;
-        double leftBackPower = fwdBackPower - strafePower;
-        double rightBackPower = fwdBackPower + strafePower;
-
-        motorFwdLeft.setPower(leftFrontPower);
-        motorFwdRight.setPower(rightFrontPower);
-        motorBackLeft.setPower(leftBackPower);
-        motorBackRight.setPower(rightBackPower);
-    }
-    public void turn(int degrees, double power){
-        int left = 1;
-        int right = 1;
-        resetAngle();
-        telemetry.addData("Angle",getAngle());
-        telemetry.update();
-        if(degrees >= 0){
-            right *= -1;
-        }
-        else if(degrees < 0){
-            left *= -1;
-        }
-
-        motorBackLeft.setPower(power * left);
-        motorFwdLeft.setPower(power * left);
-        motorBackRight.setPower(power * right);
-        motorFwdRight.setPower(power* right);
-
-        if (degrees < 0)
-        {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() >= degrees) {telemetry.addData("Angle2",getAngle());telemetry.update();}
-        }
-        else    // left turn.
-            while (opModeIsActive() && getAngle() < degrees) {telemetry.addData("Angle2",getAngle());telemetry.update();}
-
-        // turn the motors off.
-        motorBackLeft.setPower(0);
-        motorFwdLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFwdRight.setPower(0);
-    }
-    //Using the gyroscope, when a degree is passed both left and right motors move accordingly in
-    //order to turn the robot to the right or left until the bearing is equal to or greater than the
-    //specified degree. Power can also be specified.
-    //used commonly in pairs(one fast for speed and one slow for accuracy) to improve movement time.
-    public void turnToS(int degrees, double power, int loopnum){
-        int left = 1;
-        int right = 1;
-        double distance = getAngle() - degrees;
-        double startAngle = getAngle();
-        telemetry.addData("Angle3",getAngle());
-        telemetry.update();
-        if(getAngle() <= degrees){
-            left *= -1;
-        }
-        else if(getAngle() > degrees){
-            right *= -1;
-        }
-
-        motorBackLeft.setPower(power * left);
-        motorFwdLeft.setPower(power * left);
-        motorBackRight.setPower(power * right);
-        motorFwdRight.setPower(power* right);
-
-        if (getAngle() > degrees)
-        {
-            // On left turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() >= degrees) {
-                //telemetry.addData("Angle4",getAngle());
-                //telemetry.update();
-                if((startAngle + ((distance/4)*3)) > getAngle()){
-                    left *= 1.05;
-                    right *= 1.05;
-                }
-                else{
-                    if(left > 1 || left < -1 || right > 1 || right < -1){
-                        left*=0.95;
-                        right*=0.95;
-                    }
-                }
-            }
-        }
-        else {    // right turn.
-            while (opModeIsActive() && getAngle() <= degrees) {
-                //telemetry.addData("Angle4", getAngle());
-                //telemetry.update();
-                if((startAngle + ((distance/4)*3)) > getAngle()){
-                    left *= 1.05;
-                    right *= 1.05;
-                }
-                else{
-                    if(left > 1 || left < -1 || right > 1 || right < -1){
-                        left*=0.95;
-                        right*=0.95;
-                    }
-                }
-            }
-        }
-        // turn the motors off.
-        motorBackLeft.setPower(0);
-        motorFwdLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFwdRight.setPower(0);
-        if(--loopnum > 0){
-            turnToS(degrees, power/2, loopnum);
-        }
-    }
-    //Using the gyroscope, when a degree is passed both left and right motors move accordingly in
-    //order to turn the robot to the right or left until the bearing is equal to or greater than the
-    //specified degree. Power can also be specified.
-    //used commonly in pairs(one fast for speed and one slow for accuracy) to improve movement time.
-    public void turnTo(int degrees, double power){
-        int left = 1;
-        int right = 1;
-        telemetry.addData("Angle3",getAngle());
-        telemetry.update();
-        if(getAngle() >= degrees){
-            left *= -1;
-        }
-        else if(getAngle() < degrees){
-            right *= -1;
-        }
-
-        motorBackLeft.setPower(power * left);
-        motorFwdLeft.setPower(power * left);
-        motorBackRight.setPower(power * right);
-        motorFwdRight.setPower(power* right);
-
-        if (getAngle() > degrees)
-        {
-            // On left turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() >= degrees) {
-                //telemetry.addData("Angle4",getAngle());
-                //telemetry.update();
-            }
-        }
-        else {    // right turn.
-            while (opModeIsActive() && getAngle() <= degrees) {
-                //telemetry.addData("Angle4", getAngle());
-                //telemetry.update();
-            }
-        }
-        // turn the motors off.
-        motorBackLeft.setPower(0);
-        motorFwdLeft.setPower(0);
-        motorBackRight.setPower(0);
-        motorFwdRight.setPower(0);
-    }
     //  Pause for the specified amount of time (time: mili secs)
     public void pause(long millis){
         runtime.reset();
@@ -670,10 +430,10 @@ public abstract class AutoSupplies extends LinearOpMode{
         globalPitch = 0;
     }
 
-    //
-    // * Get current cumulative angle rotation from last reset.
-    // * @return Angle in degrees. + = left, - = right.
-    // *
+    /**
+     * Get current cumulative angle rotation from last reset.
+     * @return Angle in degrees. + = left, - = right.
+     */
 
 
     //uses the imu to find the current angle
@@ -721,12 +481,9 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         return globalPitch;
     }
-    public double getDistanceLeft(){
-        return distanceFwdLeft.getDistance(DistanceUnit.MM);
-    }
-    public double getDistanceRight(){
-        return distanceFwdRight.getDistance(DistanceUnit.MM);
-    }
+
+
+
 
     public void initForAutonomous()
     {
@@ -740,25 +497,45 @@ public abstract class AutoSupplies extends LinearOpMode{
         gyroParameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         gyroParameters.loggingEnabled      = false;
 
-        //initialize hardware
-        //main motors
-        motorFwdRight = hardwareMap.get(DcMotor.class, "motorFwdRight");
-        motorFwdRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackLeft = hardwareMap.get(DcMotor.class, "motorBackLeft");
-        motorBackLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFwdLeft = hardwareMap.get(DcMotor.class, "motorFwdLeft");
-        motorFwdLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorBackRight = hardwareMap.get(DcMotor.class, "motorBackRight");
-        motorBackRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motorFwdLeft.setDirection(DcMotor.Direction.REVERSE);
-        motorBackLeft.setDirection(DcMotor.Direction.REVERSE);
-        motorBackRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorBackLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFwdRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motorFwdLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //sensors
-        distanceFwdLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeft");
-        distanceFwdRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceRight");
+// Connect Motors to Phone \\
+        left_Back_Drive = hardwareMap.get(DcMotor.class, "left_Back_Drive");
+        left_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Back_Drive = hardwareMap.get(DcMotor.class, "right_Back_Drive");
+        right_Back_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Front_Drive = hardwareMap.get(DcMotor.class, "left_Front_Drive");
+        left_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Front_Drive = hardwareMap.get(DcMotor.class, "right_Front_Drive");
+        right_Front_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        left_Arm_Motor = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
+        left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        right_Arm_Motor = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
+        right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
+        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        ducky = hardwareMap.get(DcMotor.class, "ducky");
+        ducky.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        claw = hardwareMap.get(Servo.class, "claw");
+        lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
+
+// Set the direction for each of the motors \\
+        left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
+        left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
+        right_Front_Drive.setDirection(DcMotor.Direction.REVERSE);
+        right_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
+        ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        left_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         //initializes imu and calibrates it. Prepares lift motor to land using the encoder
         // Lights turn green when it is calibrated
@@ -771,5 +548,79 @@ public abstract class AutoSupplies extends LinearOpMode{
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
+
+    public void test()
+    {
+        //telemetry.update();
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfodParameters.isModelTensorFlow2 = true;
+        tfodParameters.inputSize = 320;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+    }
+
+    public void initVision(){
+        initVuforia();
+        initTfod();
+
+        if (tfod != null) {
+            tfod.activate();
+            tfod.setZoom(1, 16.0/9.0);
+        }
+    }
+
+    public Recognition getDuckPosition(){
+        if (tfod != null) {
+            List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+            if (updatedRecognitions != null) {
+                int i = 0;
+                for (Recognition recognition : updatedRecognitions) {
+                    if(recognition.getLabel() == "Ducky") {
+                        return recognition;
+                    }
+                    i++;
+                }
+                //telemetry.update();
+            }
+        }
+        return null;
+    }
+
+    public int getZone(Recognition ducky){
+        if(ducky == null){
+            return 3;
+        }
+        double avgPosition = (ducky.getLeft() + ducky.getRight()) / 2;
+        if(avgPosition >= A_Left && avgPosition <= A_Right){
+            return 1;
+        }
+        else if(avgPosition >= B_Left && avgPosition <= B_Right){
+            return 2;
+        }
+        else{
+            return -1;
+        }
+    }
 }
-*/

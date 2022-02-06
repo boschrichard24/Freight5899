@@ -119,8 +119,8 @@ public class SimpleDrive extends LinearOpMode {
             //Arm code
             double armDriveLeft  = -gamepad2.left_stick_y;
             double armDriveRight = -gamepad2.right_stick_y;
-            armLeftPower  = Range.clip(armDriveLeft, -0.5, 0.5);
-            armRightPower = Range.clip(armDriveRight, -0.5, 0.5);
+            armLeftPower  = Range.clip(armDriveLeft, -0.12, 0.12);
+            armRightPower = Range.clip(armDriveRight, -0.12, 0.12);
 
             //Spin Code
             double spinLeft = gamepad2.left_stick_x;

@@ -19,22 +19,20 @@ public class OverrideTestOp22 extends LinearOpMode{
     // Power vars
     private double leftMovePower  = 0.0;
     private double rightMovePower = 0.0;
-    private double pivotPower     = 0.0;
-    private double duckyPower     = 0.3;
+        //private double pivotPower     = 0.0;
+    private double duckyPower     = 0.57;
     // Misc. vars
-    private double spin         = 0.0;
-    private double armLeftPower         = 0.0;
-    private double armRightPower        = 0.0;
+
     private ElapsedTime runtime = new ElapsedTime();
 
-    private int level = 3;
-    double powerChange = 0.0;
+    private int level = 4;
+    double powerChange = 1.0;
     public RevBlinkinLedDriver lights;
     // Claw vars
     protected Servo claw        = null;  // This is the open and close servo of the claw \\
     final private double clawClosed       = 0.363;
-    final private double clawOpen       = 0.611;
-    private double clawPos             = 0.0;
+    final private double clawOpen         = 0.611;
+    private double clawPos                = 0.0;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
     protected DcMotor right_Back_Drive  = null;
@@ -45,13 +43,15 @@ public class OverrideTestOp22 extends LinearOpMode{
     protected DcMotor pivot_Arm_Motor   = null;
     protected DcMotor ducky             = null;
     // Button Booleans
-    boolean changed1 = false;
-    boolean changed2 = false;
-    boolean changed3 = false;
-    boolean changed4 = false;
-    boolean changed5 = false;
-    boolean changed6 = false;
-    boolean changed7 = false;
+    boolean changed1        = false;
+    boolean changed2        = false;
+    boolean changed3        = false;
+    boolean changed4        = false;
+    boolean changed5        = false;
+    boolean changed6        = false;
+    boolean changed7        = false;
+    boolean changedOverride = false;
+    boolean changedZer0     = false;
 
 //    **********     MAIN FUNCTIONS     **********     \\
 
@@ -71,14 +71,13 @@ public class OverrideTestOp22 extends LinearOpMode{
         right_Arm_Motor.setPower(power);
     }
 
-    public void setArmLevel(int targetLevel)
-    {
+    public void setArmLevel(int targetLevel) {
         int[] encoderTargets = new int[2];
 
         switch (targetLevel) {
             case 1:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                encoderTargets[0] = -597;
+                encoderTargets[0] = -607;
                 //sleep(100);
                 encoderTargets[1] = -949; // floor level to pick up pieces \\
                 break;
@@ -94,7 +93,6 @@ public class OverrideTestOp22 extends LinearOpMode{
                 break;
             case 4:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                //put light code here plug in light into the BLinkin - Blikin plugs inot the servo port - config inside of servo
                 encoderTargets[0] = -181;
                 encoderTargets[1] = -609; // level 3 on shipping container \\
                 break;
@@ -109,19 +107,40 @@ public class OverrideTestOp22 extends LinearOpMode{
                 encoderTargets[1] = -448; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+                // Override Path :
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+                encoderTargets[0] = -131;
+                encoderTargets[1] = -695; // level 3 on shipping container \\
+                runArmPower(.5);
+                left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+                right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+                sleep(1000);
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
+                encoderTargets[0] = -131;
+                encoderTargets[1] = 0; // go home \\
+                runArmPower(.5);
+                left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+                right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+                resetArmEncoders();
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                level = 5;
+                encoderTargets[0] = -12;
+                encoderTargets[1] = -587;
+                telemetry.addData("Status", "Please Reset TeleOp");
+                telemetry.update();
 
-                //whatever postiion you want for init
+
             default:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_GRAY);
                 encoderTargets[0] = 0;
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
+            runArmPower(.5);
+            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
 
-        runArmPower(.5);
-        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
 
     }
 
@@ -150,8 +169,11 @@ public class OverrideTestOp22 extends LinearOpMode{
         pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
     }
 
 
@@ -169,12 +191,10 @@ public class OverrideTestOp22 extends LinearOpMode{
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
-        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
-
         while (opModeIsActive()) {
 
-            leftMovePower = -gamepad1.left_stick_y;
-            rightMovePower = -gamepad1.right_stick_y;
+            leftMovePower = -gamepad1.left_stick_y*powerChange;
+            rightMovePower = -gamepad1.right_stick_y*powerChange;
             left_Back_Drive.setPower(leftMovePower);
             right_Back_Drive.setPower(rightMovePower);
             left_Front_Drive.setPower(leftMovePower);
@@ -182,7 +202,7 @@ public class OverrideTestOp22 extends LinearOpMode{
 
             if(gamepad1.a && !changed1) {
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_OCEAN_PALETTE);
-                if(powerChange == 0.5 || powerChange == 2.5) {
+                if(powerChange == 0.5 || powerChange == 3) {
                     powerChange = 1;
                 }
                 else {
@@ -196,11 +216,11 @@ public class OverrideTestOp22 extends LinearOpMode{
 
             if(gamepad1.b && !changed7) {
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
-                if(powerChange == 0.5 || powerChange == 2.5) {
+                if(powerChange == 0.5 || powerChange == 3) {
                     powerChange = 1;
                 }
                 else {
-                    powerChange = 2.5;
+                    powerChange = 3;
                 }
                 changed7 = true;
             }
@@ -211,8 +231,12 @@ public class OverrideTestOp22 extends LinearOpMode{
             //   I N V E R S E   \\
             if(gamepad1.x && !changed2) {
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_FOREST_PALETTE);
-                leftMovePower = gamepad1.left_stick_y;
-                rightMovePower = gamepad1.right_stick_y;
+                if(powerChange > 0) {
+                    powerChange = -1;
+                }
+                else{
+                    powerChange = 1;
+                }
                 changed2 = true;
             }
             else if(!gamepad1.x){
@@ -220,42 +244,48 @@ public class OverrideTestOp22 extends LinearOpMode{
             }
 
 //  S P I N  func  \\
-            if(gamepad2.left_trigger>0.2 && !(gamepad2.right_trigger>0.2)) {
-                spin = -gamepad2.left_trigger*0.5;
-                pivot_Arm_Motor.setPower(spin);
+            if(gamepad2.left_bumper && !(gamepad2.right_bumper)) {
+                pivot_Arm_Motor.setPower(-0.35);
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
             }
-            else if(gamepad2.right_trigger>0 && !(gamepad2.left_trigger>0)){
-                spin = gamepad2.right_trigger*0.5;
+            else if(gamepad2.right_bumper && !(gamepad2.left_bumper)){
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
-                pivot_Arm_Motor.setPower(spin);
+                pivot_Arm_Motor.setPower(0.35);
+            }
+            else{
+                pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                pivot_Arm_Motor.setPower(0);
             }
 //  D U C K Y func  \\
             if (gamepad1.right_bumper && !ducky.isBusy()) {
-                runtime.reset();
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
-                long millis = 2000;
+                long millis = 1100;
                 runtime.reset();
-                while (runtime.milliseconds() <= millis) {
+                while(runtime.milliseconds() <= millis){
                     ducky.setPower(duckyPower);
-                    duckyPower += 0.001;
+                }
+                millis = 600;
+                runtime.reset();
+                while(runtime.milliseconds() <= millis){
+                    ducky.setPower(duckyPower+1.5);
                 }
                 ducky.setPower(0);
-                duckyPower = 0.3;
             }
-
-            if (gamepad1.left_bumper && !ducky.isBusy()) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_BEATS_PER_MINUTE);
-                long millis = 2000;
+            else if (gamepad1.left_bumper && !ducky.isBusy()) {
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
+                long millis = 1100;
                 runtime.reset();
                 while (runtime.milliseconds() <= millis) {
                     ducky.setPower(-duckyPower);
-                    duckyPower += 0.001;
+                }
+                millis = 600;
+                runtime.reset();
+                while (runtime.milliseconds() <= millis) {
+                    ducky.setPower(-duckyPower - 1.5);
                 }
                 ducky.setPower(0);
-                duckyPower = 0.3;
             }
 
 //  A R M  func  \\
@@ -276,10 +306,16 @@ public class OverrideTestOp22 extends LinearOpMode{
                 changed5 = true;
             }else if(!gamepad2.x){changed5 = false;}
             if(gamepad2.y && !changed6){
-                level = 3;
+                level = 6;
                 changed6 = true;
             }else if(!gamepad2.y){changed6 = false;}
-
+/*
+            //accesses the override
+            if(gamepad2.left_stick_button && !changedOverride){
+                level = 7;
+                changedOverride = true;
+            }else if(!gamepad2.left_stick_button){changedOverride = false; level = 3;}
+*/
             setArmLevel(level);
 
 //  C L A W func \\
@@ -296,26 +332,12 @@ public class OverrideTestOp22 extends LinearOpMode{
                 }
                 claw.setPosition(clawPos);
             }
-
-            // ******************               OVERIDE ARM func              ******************  \\
-            if(gamepad2.right_bumper && gamepad2.left_bumper) {
-                resetArmEncoders();
-                armLeftPower = -gamepad2.left_trigger*0.5;
-                left_Arm_Motor.setPower(armLeftPower);
-                //pivotPower = Range.clip(spin, 0, 0.5);
-                //pivot_Arm_Motor.setPower(pivotPower);
-                armRightPower =  -gamepad2.right_trigger*0.5;
-                right_Arm_Motor.setPower(armRightPower);
-
-            }
-            else if(gamepad2.right_trigger>0 && !(gamepad2.left_trigger>0)){
-                resetArmEncoders();
-                spin = gamepad2.right_trigger*0.5;
-                //pivotPower = Range.clip(spin, 0, 0.5);
-                //pivot_Arm_Motor.setPower(pivotPower);
-                pivot_Arm_Motor.setPower(spin);
-            }
-
+/*
+            if(gamepad2.right_stick_button && !changedZer0){
+                runArmPower(0.0);
+                changedZer0 = true;
+            }else if(!gamepad2.right_stick_button){changedZer0 = false; }
+*/
 
 //  T E M E T R Y  D A T A  \\
             telemetry.addData("  <===============>  ", "");
@@ -339,5 +361,4 @@ public class OverrideTestOp22 extends LinearOpMode{
         }
     }
 }
-
 

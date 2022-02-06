@@ -85,29 +85,29 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 break;
             case 2:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                encoderTargets[0] = 42;
-                encoderTargets[1] = 213; // level 1 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 100; // level 1 on shipping container \\
                 break;
             case 3:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                encoderTargets[0] = 265;
-                encoderTargets[1] = 185; // level 2 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 130; // level 2 on shipping container \\
                 break;
             case 4:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
                 //put light code here plug in light into the BLinkin - Blikin plugs inot the servo port - config inside of servo
-                encoderTargets[0] = 440;
-                encoderTargets[1] = 185; // level 3 on shipping container \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 300; // level 3 on shipping container \\
                 break;
             case 5:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 594;
-                encoderTargets[1] = 530; // top of shipping container for gamepiece \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 500; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = 647;
-                encoderTargets[1] = 592; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 530; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -261,8 +261,6 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        hardwareSetup();
-
         waitForStart();
 
 //  E N C O D E R S SET up  \\
@@ -279,11 +277,11 @@ public class CompetitionTeleOp22 extends LinearOpMode {
 
 //  D U C K Y func  \\
             runtime.reset();
-            if (gamepad1.right_bumper && !ducky.isBusy()) {
+            if(gamepad1.right_bumper && !ducky.isBusy()){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
                 long millis = 2000;
                 runtime.reset();
-                while (runtime.milliseconds() <= millis) {
+                while(runtime.milliseconds() <= millis){
                     ducky.setPower(duckyPower);
                     duckyPower += 0.001;
                 }
@@ -291,7 +289,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             }
 
 //  A R M  func  \\
-            if(gamepad2.dpad_up && !changed3){
+            /*if(gamepad2.dpad_up && !changed3){
                 if(level == 7){level = 0;}
                 level ++;
                 if(level > 6){level = 6;}
@@ -310,23 +308,23 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             if(gamepad2.y && !changed6){
                 level = 3;
                 changed6 = true;
-            }else if(!gamepad2.y){changed6 = false;}
-// This will set a new level when you press the dpad button up and \\
-// will wait until you let go to be able to go to a new level \\
+            }else if(!gamepad2.y){changed6 = false;} */
+            // This will set a new level when you press the dpad button up and \\
+            // will wait until you let go to be able to go to a new level \\
             armFunction();
 
 //  C L A W func \\
             if(gamepad2.x && clawPos < clawMax){
                 while(clawPos < clawMax) {
                     clawPos += 0.3;
-                    claw.setPosition(clawPos);
                 }
+                claw.setPosition(clawPos);
             }
             else if(gamepad2.b && clawPos > clawMin){
                 while(clawPos > clawMin) {
                     clawPos -= 0.3;
-                    claw.setPosition(clawPos);
                 }
+                claw.setPosition(clawPos);
             }
 
             // ******************               OVERIDE ARM func              ******************  \\
@@ -339,8 +337,8 @@ public class CompetitionTeleOp22 extends LinearOpMode {
                 double armRightPower;
                 double armDriveLeft  = -gamepad2.left_stick_y;
                 double armDriveRight = -gamepad2.right_stick_y;
-                armLeftPower  = Range.clip(armDriveLeft, -0.35, 0.35);
-                armRightPower = Range.clip(armDriveRight, -0.35, 0.35);
+                armLeftPower  = Range.clip(armDriveLeft, -0.5, 0.5);
+                armRightPower = Range.clip(armDriveRight, -0.5, 0.5);
                 left_Arm_Motor.setPower(armLeftPower);
                 right_Arm_Motor.setPower(armRightPower);
 

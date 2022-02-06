@@ -13,15 +13,16 @@ import org.firstinspires.ftc.teamcode.AutoCode.AutoSupplies;
 //webcam imports
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 
-@Autonomous(name="Blue Left Auto", group="CompetitionAuto")
+@Autonomous(name="RedRight Auto", group="CompetitionAuto")
 //@Disabled
-public class BlueLeft extends AutoSupplies{
+public class RedRight extends AutoSupplies {
     @Override
     public void runOpMode() {
 
         //  Establish all hardware
         initForAutonomous();
         //  Wait until start
+        //waitForStart();
         initVision();
 
         /** Wait for the game to begin */
@@ -31,35 +32,36 @@ public class BlueLeft extends AutoSupplies{
 
         int path = 0;
 
-                Recognition duck = null;
-                long halfSec = 500;
-                runtime.reset();
-                while(runtime.milliseconds() <= halfSec){
-                    duck = getDuckPosition();
-                    if(duck != null){
-                        break;
-                    }
-                }
-                path = getZone(duck);
-                telemetry.addLine("Path: " + path);
-                telemetry.update();
+        Recognition duck = null;
+        long halfSec = 700;
+        runtime.reset();
+        while (runtime.milliseconds() <= halfSec) {
+            duck = getDuckPosition();
+            if (duck != null) {
+                break;
+            }
+        }
+        path = getZone(duck);
+        telemetry.addLine("Path: " + path);
+        telemetry.update();
 
         //sleep(300);
         if (path == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
         } else if (path == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if(path == 3){
+        } else if (path == 3) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-        } else{ lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED); }
+        } else {
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+        }
         clawOpen();
-
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         encoderMove(250,0.5,0.5);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_PARTY_PALETTE);
-        turnToS(90,0.7,3);
+        turnToS(-90,0.7,3);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
@@ -67,16 +69,11 @@ public class BlueLeft extends AutoSupplies{
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_OCEAN_PALETTE);
-        turnToS(135,0.5,3);
+        turnToS(225,0.5,3);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
 
 
-
-
     }
 }
-//Possible link to add voltage sensor into our code.
-//https://www.reddit.com/r/FTC/comments/5cnilm/help_how_to_get_robot_battery_levelvoltage/
-
