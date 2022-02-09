@@ -49,10 +49,13 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     boolean changed5 = false;
     boolean changed6 = false;
     boolean changed7 = false;
-
+    
     boolean changedToNewLevel = false;
 
     boolean armOverrideActived = false;
+    
+    // Spinner intake. Will be negative if moving backward \\
+    double spinnerPower = 0.0;
 
 
 //    **********     MAIN FUNCTIONS     **********     \\
@@ -136,10 +139,11 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
-        claw = hardwareMap.get(Servo.class, "claw");
+        //claw = hardwareMap.get(Servo.class, "claw");
+        intake_Spinner = hardwareMap.get(CSServo.class, "spinner");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
-//  Set the direction for each of the motors  \\
+//  Set the direction for each of the DC motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
         right_Back_Drive.setDirection(DcMotor.Direction.REVERSE);
         left_Front_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -256,7 +260,35 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             prevLevel = level;
         }
     }
-
+    
+    void clawFunction()
+    {
+        if(gamepad2.x && clawPos < clawMax){
+            while(clawPos < clawMax) {
+                clawPos += 0.3;
+            }
+            claw.setPosition(clawPos);
+        }
+        else if(gamepad2.b && clawPos > clawMin){
+            while(clawPos > clawMin) {
+                clawPos -= 0.3;
+            }
+            claw.setPosition(clawPos);
+        }
+    }
+    
+    void spinnerIntakeFunction()
+    {
+        if (gamepad2.right_Trigger > 0.1) {
+            spin = 1.0;
+        } else if (gamepad2.left_Trigger > 0.1) {
+            spin = -1.0;
+        } else {
+            spin = 0.0;
+        }
+        
+        intake_Spinner.setPower(spin);
+    }
 
     @Override
     public void runOpMode() {
@@ -314,22 +346,11 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             armFunction();
 
 //  C L A W func \\
-            if(gamepad2.x && clawPos < clawMax){
-                while(clawPos < clawMax) {
-                    clawPos += 0.3;
-                }
-                claw.setPosition(clawPos);
-            }
-            else if(gamepad2.b && clawPos > clawMin){
-                while(clawPos > clawMin) {
-                    clawPos -= 0.3;
-                }
-                claw.setPosition(clawPos);
-            }
+            
 
-            // ******************               OVERIDE ARM func              ******************  \\
+            // ******************               OVERIDE ARM func   (NoPe)           ******************  \\
 
-            if(gamepad2.left_trigger>0.5 && gamepad2.right_trigger>0.5){
+            /*if(gamepad2.left_trigger>0.5 && gamepad2.right_trigger>0.5){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_OCEAN_PALETTE);
                 right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -346,7 +367,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             }
             else {
                 armOverrideActived = false;
-            }
+            }*/
 
 //  T E M E T R Y  D A T A  \\
             telemetry.addData("  <===============>  ", "");
