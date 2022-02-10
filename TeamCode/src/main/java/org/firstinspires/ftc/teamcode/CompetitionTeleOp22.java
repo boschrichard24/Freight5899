@@ -3,11 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.Servo;
+
 
 @TeleOp(name="CompetitionTeleOp22", group="Linear Opmode")
 
@@ -32,6 +34,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     final private double clawMin       = 0.601;
     private double clawPos             = 0.0;
     private double powerChange         = 1.0;
+    protected CRServo intake_Spinner = null;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
     protected DcMotor right_Back_Drive  = null;
@@ -140,7 +143,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         //claw = hardwareMap.get(Servo.class, "claw");
-        intake_Spinner = hardwareMap.get(CSServo.class, "spinner");
+        intake_Spinner = hardwareMap.get(CRServo.class, "spinner");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
 //  Set the direction for each of the DC motors  \\
@@ -279,9 +282,9 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     
     void spinnerIntakeFunction()
     {
-        if (gamepad2.right_Trigger > 0.1) {
+        if (gamepad2.right_trigger > 0.1) {
             spin = 1.0;
-        } else if (gamepad2.left_Trigger > 0.1) {
+        } else if (gamepad2.left_trigger > 0.1) {
             spin = -1.0;
         } else {
             spin = 0.0;
