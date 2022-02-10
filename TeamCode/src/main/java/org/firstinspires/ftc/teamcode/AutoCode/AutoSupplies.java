@@ -127,7 +127,6 @@ public abstract class AutoSupplies extends LinearOpMode{
         double leftBackPower = lp;
         double rightBackPower = rp;
         double maxPower;
-        double max = 1.0;
         double posPower = 0.2;
         maxPower = Math.abs(leftFrontPower);
         if (Math.abs(rightFrontPower) > maxPower) {
@@ -144,7 +143,6 @@ public abstract class AutoSupplies extends LinearOpMode{
             rightFrontPower = rightFrontPower / maxPower;
             leftBackPower = leftBackPower / maxPower;
             rightBackPower = rightBackPower / maxPower;
-
         }
         //sets the power of the motors
         double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
@@ -168,11 +166,54 @@ public abstract class AutoSupplies extends LinearOpMode{
             else{
                 posPower = .25;
             }
-            left_Front_Drive.setPower(leftFrontPower*max*posPower);
-            left_Back_Drive.setPower(leftBackPower*max*posPower);
-            right_Front_Drive.setPower(rightFrontPower*max*posPower);
-            right_Back_Drive.setPower(rightBackPower*max*posPower);
+            left_Front_Drive.setPower(leftFrontPower*posPower);
+            left_Back_Drive.setPower(leftBackPower*posPower);
+            right_Front_Drive.setPower(rightFrontPower*posPower);
+            right_Back_Drive.setPower(rightBackPower*posPower);
         }
+        left_Front_Drive.setPower(0);
+        left_Back_Drive.setPower(0);
+        right_Front_Drive.setPower(0);
+        right_Back_Drive.setPower(0);
+    }
+    
+    public void alternateEncoderMove(double degrees, double lp, double rp){
+        resetDriveEncoders();
+        double counts = degrees * COUNTS_PER_DEGREE1;
+
+        double leftPower = lp;
+        double rightPower = rp;
+        double lfPower = lp;
+        double lbPower = lp;
+        double rfPower = rp;
+        double rbPower = rp;
+        
+        // clamping values between 1 and -1 \\
+        if (rightPower > 1.0) { rightPower = 1.0; }
+        if (rightPower < -1.0) { rightPower = -1.0; }
+        if (leftPower > 1.0) { leftPower = 1.0; }
+        if (leftPower < -1.0) { leftPower = -1.0; }
+                                                                            
+        // this is the average encoder value of all the motors \\
+        double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                + Math.abs(right_Front_Drive.getCurrentPosition())
+                + Math.abs(left_Back_Drive.getCurrentPosition())
+                + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+        
+        while (opModeIsActive() && averageEnc <= Math.abs(counts)){
+            averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                    + Math.abs(right_Front_Drive.getCurrentPosition())
+                    + Math.abs(left_Back_Drive.getCurrentPosition())
+                    + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+            
+            
+            
+            left_Front_Drive.setPower(leftPower);
+            left_Back_Drive.setPower(leftPower);
+            right_Front_Drive.setPower(rightPower);
+            right_Back_Drive.setPower(rightPower);
+        }
+        
         left_Front_Drive.setPower(0);
         left_Back_Drive.setPower(0);
         right_Front_Drive.setPower(0);
