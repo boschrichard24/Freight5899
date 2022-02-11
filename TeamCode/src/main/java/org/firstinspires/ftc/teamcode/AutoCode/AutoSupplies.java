@@ -183,30 +183,32 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         double leftPower = lp;
         double rightPower = rp;
-        double lfPower = lp;
-        double lbPower = lp;
-        double rfPower = rp;
-        double rbPower = rp;
         
         // clamping values between 1 and -1 \\
         if (rightPower > 1.0) { rightPower = 1.0; }
         if (rightPower < -1.0) { rightPower = -1.0; }
         if (leftPower > 1.0) { leftPower = 1.0; }
         if (leftPower < -1.0) { leftPower = -1.0; }
-                                                                            
+        
+        // "If the power is negative and degrees is positive..." \\
+        // "...then make the power positive." \\
+        if (rightPower < 0 && counts > 0) { rightPower = Math.abs(rightPower); }        // This is really just here for convinience. \\
+        if (rightPower > 0 && counts < 0) { rightPower = (Math.abs(rightPower)) * -1; } // You can put a power regardless of the target degree (as in \\
+        if (leftPower < 0 && counts > 0) { leftPower = Math.abs(leftPower); }           // you can give a negative degree and positive power) \\
+        if (leftPower > 0 && counts < 0) { leftPower = (Math.abs(leftPower)) * -1; }    
+                                                                                           
         // this is the average encoder value of all the motors \\
         double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
                 + Math.abs(right_Front_Drive.getCurrentPosition())
                 + Math.abs(left_Back_Drive.getCurrentPosition())
                 + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
         
+        // "While the robot is running and the average encoder values don't exceed the required encoder target..." \\
         while (opModeIsActive() && averageEnc <= Math.abs(counts)){
             averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
                     + Math.abs(right_Front_Drive.getCurrentPosition())
                     + Math.abs(left_Back_Drive.getCurrentPosition())
                     + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
-            
-            
             
             left_Front_Drive.setPower(leftPower);
             left_Back_Drive.setPower(leftPower);
@@ -214,6 +216,7 @@ public abstract class AutoSupplies extends LinearOpMode{
             right_Back_Drive.setPower(rightPower);
         }
         
+        // Don't leave the motors on: \\
         left_Front_Drive.setPower(0);
         left_Back_Drive.setPower(0);
         right_Front_Drive.setPower(0);
