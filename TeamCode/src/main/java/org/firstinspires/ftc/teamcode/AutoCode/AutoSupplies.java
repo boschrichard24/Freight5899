@@ -6,6 +6,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -32,6 +33,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 
 public abstract class AutoSupplies extends LinearOpMode{
+
+                        //             < < < [ VARIABLES BEGIN HERE ] > > >             \\
     // Motors, servos, etc.
     protected DcMotor left_Back_Drive = null;
     protected DcMotor right_Back_Drive = null;
@@ -50,13 +53,16 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected Orientation lastPitches = new Orientation();
 
     protected RevBlinkinLedDriver lights;
-    protected Servo claw = null;  // This is the open and close servo of the claw \\
+    protected CRServo basket = null;  // This is the open and close servo of the claw \\
     protected DcMotor ducky = null;
-
-    // For the claw servo \\
-    double lArmMotorEncoderTarget = 0.0; // Angle of arm \\
-    double rArmMotorEncoderTarget = 0.0; // Tilt of entire arm
-
+/*
+    protected Rev2mDistanceSensor distanceFwdLeft = null;
+    protected Rev2mDistanceSensor distanceFwdRight = null;
+    protected Rev2mDistanceSensor distanceBackLeft = null;
+    protected Rev2mDistanceSensor distanceBackRight = null;
+    protected Rev2mDistanceSensor distanceLeftTop = null;
+    protected Rev2mDistanceSensor distanceLeftBottom = null;
+*/
     //Encoder Values
     //Neverest 40 motor spec: quadrature encoder, 7 pulses per revolution, count = 7 * 40
     private static final double COUNTS_PER_MOTOR_REV = 420; // Neverest 40 motor encoder - orginal val = 280
@@ -99,7 +105,7 @@ public abstract class AutoSupplies extends LinearOpMode{
     private VuforiaLocalizer vuforia;
     private TFObjectDetector tfod;
 
-
+                        // //             < < < [ FUNCTIONS BEGIN HERE ] > > >             \\ \\
 
     //move
     public void move(long millis, double lp, double rp) {
@@ -380,11 +386,11 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setPower(power);
     }
 
-    public void clawOpen(){
-        claw.setPosition(0.611);
+    public void BasketIn(){
+        basket.setPower(5);
     }
-    public void clawClosed(){
-        claw.setPosition(0.363);
+    public void BasketOut(){
+        basket.setPower(-5.0);
     }
 
 
@@ -558,9 +564,17 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         ducky = hardwareMap.get(DcMotor.class, "ducky");
         ducky.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//sensors
+        /*
+        distanceFwdLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceFwdLeft");
+        distanceFwdRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceFwdRight");
+        distanceBackLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceBackLeft");
+        distanceBackRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceBackRight");
+        distanceLeftTop = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeftTop");
+        distanceLeftBottom = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeftBottom");
+         */
 
-
-        claw = hardwareMap.get(Servo.class, "claw");
+        basket = hardwareMap.get(CRServo.class, "basket");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
 // Set the direction for each of the motors \\
@@ -572,6 +586,8 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        basket.setDirection(CRServo.Direction.FORWARD);
 
         left_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -667,4 +683,113 @@ public abstract class AutoSupplies extends LinearOpMode{
             return -1;
         }
     }
+
+                       // //             < < < [ DIST SENSOR CODE BEGIN HERE ] > > >             \\ \\
+
+    /*
+    public double getDistanceFwdLeft(){
+        return distanceFwdLeft.getDistance(DistanceUnit.MM);
+    }
+    public double getDistanceFwdRight(){
+        return distanceFwdRight.getDistance(DistanceUnit.MM);
+    }
+    public double getDistanceBackLeft(){
+        return distanceBackRight.getDistance(DistanceUnit.MM);
+    }
+    public double getDistanceBackRight(){
+        return distanceBackRight.getDistance(DistanceUnit.MM);
+    }
+
+    public double getDistanceLeftTop(){ return distanceLeftTop.getDistance(DistanceUnit.MM); }
+    public double getDistanceLeftBottom(){ return distanceLeftBottom.getDistance(DistanceUnit.MM); }
+
+    public void moveUsingLeftDistance(double distance, double power){//- means strafe left and + means strafe right
+        while (opModeIsActive()) {
+            double dist = distanceLeftTop.getDistance(DistanceUnit.MM);
+            double dist2 = distanceLeftBottom.getDistance(DistanceUnit.MM);
+            //time out check
+            if(dist == 65535 || distanceLeftTop.didTimeoutOccur()) {
+                dist = 65535;
+            }
+            if(dist2 == 65535 || distanceLeftBottom.didTimeoutOccur()){
+                dist2 = 65535;
+            }
+            if(dist >= 8000 || dist2 >= 8000){
+                dist = 8190;
+                dist2 = 8190;
+            }
+            //telemetry
+            telemetry.addData("distance val 1", dist);
+            telemetry.addData("distance val 2", dist2);
+            //power set or loop break if distance traveled is met
+            if(power <= 0) {
+                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
+                    setPower(power, 0);
+                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
+                    setPower(power, 0);
+                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
+                    setPower(power, 0);
+                } else {
+                    break;
+                }
+            }
+            else {
+                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
+                    setPower(power, 0);
+                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
+                    setPower(power, 0);
+                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
+                    setPower(power, 0);
+                } else {
+                    break;
+                }
+            }
+            telemetry.update();
+        }
+    }
+    public void moveUsingFwdDistance(double distance, double power){//- means strafe back and + means strafe fwd
+        while (opModeIsActive()) {
+            double dist = distanceFwdLeft.getDistance(DistanceUnit.MM);
+            double dist2 = distanceFwdRight.getDistance(DistanceUnit.MM);
+            //time out check
+            if(dist == 65535 || distanceFwdLeft.didTimeoutOccur()) {
+                dist = 65535;
+            }
+            if(dist2 == 65535 || distanceFwdRight.didTimeoutOccur()){
+                dist2 = 65535;
+            }
+            if(dist >= 8190 || dist2 >= 8190){
+                dist = 8190;
+                dist2 = 8190;
+            }
+            //telemetry
+            telemetry.addData("distance val 1", dist);
+            telemetry.addData("distance val 2", dist2);
+            //power set or loop break if distance traveled is met
+            if(power <= 0) {
+                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 < distance) {
+                    setPower(0, power);
+                } else if (dist != 65535 && dist2 == 65535 && dist < distance) {
+                    setPower(0, power);
+                } else if (dist == 65535 && dist2 != 65535 && dist2 < distance) {
+                    setPower(0, power);
+                } else {
+                    break;
+                }
+            }
+            else {
+                if (dist != 65535 && dist2 != 65535 && (dist + dist2) / 2 > distance) {
+                    setPower(0, power);
+                } else if (dist != 65535 && dist2 == 65535 && dist > distance) {
+                    setPower(0, power);
+                } else if (dist == 65535 && dist2 != 65535 && dist2 > distance) {
+                    setPower(0, power);
+                } else {
+                    break;
+                }
+            }
+            telemetry.update();
+        }
+    }
+*/
 }

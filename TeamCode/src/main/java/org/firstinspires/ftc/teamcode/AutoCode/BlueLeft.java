@@ -52,7 +52,7 @@ public class BlueLeft extends AutoSupplies{
         } else if(path == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
         } else{ lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED); }
-        clawOpen();
+        //clawOpen();
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         encoderMove(250,0.5,0.5);

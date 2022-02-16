@@ -55,7 +55,7 @@ public class RedEmergaency extends AutoSupplies {
         } else {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
-        clawOpen();
+       // clawOpen();
         encoderMove(500, .5, .7);
         turnToS(180, .6, 2);
         duckyMotorPower('B');
@@ -81,7 +81,7 @@ public class RedEmergaency extends AutoSupplies {
         setArmLevel(1);
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_2_TWINKLES);
         sleep(400);
-        clawClosed();
+        //clawClosed();
         sleep(200);
         setArmLevel(5);
         sleep(500);
@@ -108,13 +108,13 @@ public class RedEmergaency extends AutoSupplies {
         setDrivePower(0,0);
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LARSON_SCANNER_RED);
         for(int i = 0; i < 3; i++){
-            clawOpen();
+            //clawOpen();
             sleep(500);
-            clawClosed();
+           // clawClosed();
             sleep(500);
-            clawOpen();
+           // clawOpen();
             sleep(100);
-            clawClosed();
+           // clawClosed();
             sleep(100);
         }
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);

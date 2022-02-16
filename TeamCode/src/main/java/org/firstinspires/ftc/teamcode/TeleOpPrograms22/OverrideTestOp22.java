@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TeleOpPrograms22;
 
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,22 +19,18 @@ public class OverrideTestOp22 extends LinearOpMode{
     // ******************               VARIABLE DEF-S              ******************  \\
 
     // Power vars
-    private double leftMovePower  = 0.0;
-    private double rightMovePower = 0.0;
-        //private double pivotPower     = 0.0;
-    private double duckyPower     = 0.57;
+    private double leftMovePower        = 0.0;
+    private double rightMovePower       = 0.0;
+    //private double pivotPower         = 0.0;
+    private double duckyPower           = 0.57;
     // Misc. vars
-
     private ElapsedTime runtime = new ElapsedTime();
-
-    private int level = 4;
-    double powerChange = 1.0;
-    public RevBlinkinLedDriver lights;
+    private int level                   = 4;
+    private double powerChange          = 1.0;
+    protected RevBlinkinLedDriver lights;
     // Claw vars
-    protected Servo claw        = null;  // This is the open and close servo of the claw \\
-    final private double clawClosed       = 0.363;
-    final private double clawOpen         = 0.611;
-    private double clawPos                = 0.0;
+    protected CRServo basket            = null;  // This is the open and close servo of the claw \\
+    private double basketPower          = 5.0;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
     protected DcMotor right_Back_Drive  = null;
@@ -43,15 +41,18 @@ public class OverrideTestOp22 extends LinearOpMode{
     protected DcMotor pivot_Arm_Motor   = null;
     protected DcMotor ducky             = null;
     // Button Booleans
-    boolean changed1        = false;
-    boolean changed2        = false;
-    boolean changed3        = false;
-    boolean changed4        = false;
-    boolean changed5        = false;
-    boolean changed6        = false;
-    boolean changed7        = false;
-    boolean changedOverride = false;
-    boolean changedZer0     = false;
+    private boolean changed1            = false;
+    private boolean changed2            = false;
+    private boolean changed3            = false;
+    private boolean changed4            = false;
+    private boolean changed5            = false;
+    private boolean changed6            = false;
+    private boolean changed7            = false;
+    private boolean changedOverride     = false;
+    private boolean changedZer0         = false;
+    //Sensor Variables
+    protected RevTouchSensor touchLeft  = null;
+    protected RevTouchSensor touchRight = null;
 
 //    **********     MAIN FUNCTIONS     **********     \\
 
@@ -156,8 +157,12 @@ public class OverrideTestOp22 extends LinearOpMode{
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
-        claw = hardwareMap.get(Servo.class, "claw");
+        basket = hardwareMap.get(CRServo.class, "basket");
+        touchLeft = hardwareMap.get(RevTouchSensor.class, "touchLeft");
+        touchRight = hardwareMap.get(RevTouchSensor.class, "touchRight");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
+
+        pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 //  Set the direction for each of the motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -168,6 +173,8 @@ public class OverrideTestOp22 extends LinearOpMode{
         left_Arm_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         pivot_Arm_Motor.setDirection(DcMotorSimple.Direction.FORWARD);
         ducky.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        basket.setDirection(CRServo.Direction.FORWARD);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_RAINBOW_PALETTE);
 
@@ -245,17 +252,16 @@ public class OverrideTestOp22 extends LinearOpMode{
 
 //  S P I N  func  \\
             if(gamepad2.left_bumper && !(gamepad2.right_bumper)) {
-                pivot_Arm_Motor.setPower(-0.35);
+                pivot_Arm_Motor.setPower(-0.65);
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
             }
             else if(gamepad2.right_bumper && !(gamepad2.left_bumper)){
                 //pivotPower = Range.clip(spin, 0, 0.5);
                 //pivot_Arm_Motor.setPower(pivotPower);
-                pivot_Arm_Motor.setPower(0.35);
+                pivot_Arm_Motor.setPower(0.65);
             }
             else{
-                pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
                 pivot_Arm_Motor.setPower(0);
             }
 //  D U C K Y func  \\
@@ -319,19 +325,13 @@ public class OverrideTestOp22 extends LinearOpMode{
             setArmLevel(level);
 
 //  C L A W func \\
-            if(gamepad2.a && clawPos < clawOpen){
-                while(clawPos < clawOpen) {
-                    clawPos += 0.05;
-                }
-                claw.setPosition(clawPos);
-
+            if(gamepad2.a && !gamepad2.b){
+                basket.setPower(basketPower);
             }
-            else if(gamepad2.b && clawPos > clawClosed){
-                while(clawPos > clawClosed) {
-                    clawPos -= 0.05;
-                }
-                claw.setPosition(clawPos);
+            else if(gamepad2.b && !gamepad2.a){
+                basket.setPower(-1);
             }
+            else{ basket.setPower(01*basketPower); }
 /*
             if(gamepad2.right_stick_button && !changedZer0){
                 runArmPower(0.0);

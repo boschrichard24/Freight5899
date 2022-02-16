@@ -55,7 +55,7 @@ public class RedRight extends AutoSupplies {
         } else {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
         }
-        clawOpen();
+        //clawOpen();
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         encoderMove(250,0.5,0.5);
         pause(1000);
