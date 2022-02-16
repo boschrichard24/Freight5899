@@ -31,5 +31,12 @@ public class TestAltMoveFunc extends AutoSupplies {
         waitForStart();
 
         //  ********************  Enter Code Here  ********************  \\
+        
+        alternateEncoderMove(250, 1, 1);
+        
+        
+        
+        
+        
     }
 }
