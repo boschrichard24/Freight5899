@@ -200,8 +200,13 @@ public abstract class AutoSupplies extends LinearOpMode{
         // "...then make the power positive." \\
         if (rightPower < 0 && counts > 0) { rightPower = Math.abs(rightPower); }        // This is really just here for convinience. \\
         if (rightPower > 0 && counts < 0) { rightPower = (Math.abs(rightPower)) * -1; } // You can put a power regardless of the target degree (as in \\
-        if (leftPower < 0 && counts > 0) { leftPower = Math.abs(leftPower); }           // you can give a negative degree and positive power) \\
-        if (leftPower > 0 && counts < 0) { leftPower = (Math.abs(leftPower)) * -1; }    
+        if (leftPower < 0 && counts > 0) { leftPower = Math.abs(leftPower); }           // you can give a negative degree and positive power). \\
+        if (leftPower > 0 && counts < 0) { leftPower = (Math.abs(leftPower)) * -1; }    // Choose direction with degrees, not power. \\
+      
+        if (counts == 0) { 
+          leftPower = 0;
+          rightPower = 0;               
+        }
                                                                                            
         // this is the average encoder value of all the motors \\
         double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
