@@ -1,11 +1,10 @@
 package org.firstinspires.ftc.teamcode.CheeseTest;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name="TouchSensorConcept", group="CheeseTest")
 
-public class TouchSensorConcept extends AutoSupplies {
+public class TouchSensorConcept extends CheeseAutoSupplies {
     @Override
     public void runOpMode() {
 
@@ -17,37 +16,31 @@ public class TouchSensorConcept extends AutoSupplies {
 
         pause( 1000 );
         //L
-        move(3000,0,-0.3);
+        motorBackLeft.setPower(0.25);
+        motorBackRight.setPower(0.25);
+        motorFwdLeft.setPower(0.25);
+        motorFwdRight.setPower(0.25);
 
-        if(touchLeft.isPressed() || touchRight.isPressed()){
-            pause(100);
-            move(500, 0, 0.3);
-
-            pause(100);
-            move(1000, 0.3, 0.3);
+        while(touchLeft.isPressed() && touchRight.isPressed()){
+            idle();
         }
+        telemetry.addData("TouchLeft", touchLeft.isPressed());
+        telemetry.addData("TouchRight", touchRight.isPressed());
+        telemetry.update();
+            pause(5000);
 
-        pause(100);
-        move(1000, 1, 0);
-        pause(500);
-        //Transfer to O
-        move(2000,.5, 0);
-        pause(1000);
-        //O
-        move(1000,.5, .5);
-        pause(100);
-        move(1000,-.5, .5);
-        pause(100);
-        move(1000,-.5, -.5);
-        pause(100);
-        move(1000,.5, -.5);
-        pause(100);
 
         //  Turn all motors off and sleep
-        motorFwdLeft.setPower(0);
-        motorFwdRight.setPower(0);
-        motorBackLeft.setPower(0);
-        motorBackRight.setPower(0);
-        sleep(1000);
+        motorBackLeft.setPower(-0.25);
+        motorBackRight.setPower(-0.25);
+        motorFwdLeft.setPower(-0.25);
+        motorFwdRight.setPower(-0.25);
+
+        while(touchLeft.isPressed() && touchRight.isPressed()){
+            idle();
+        }
+
+        telemetry.addData("TouchLeft", touchLeft.isPressed());
+
     }
 }

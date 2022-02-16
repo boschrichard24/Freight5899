@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.CheeseTest;
 
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -20,6 +21,8 @@ public class CheeseBot extends LinearOpMode {
     protected Rev2mDistanceSensor distanceLeft = null;
     protected Rev2mDistanceSensor distanceRight = null;
     protected ColorSensor colorLeft = null;
+    protected RevTouchSensor touchLeft = null;
+    protected RevTouchSensor touchRight = null;
     //protected CRServo servo = null;
 
     //Variables
@@ -47,6 +50,9 @@ public class CheeseBot extends LinearOpMode {
         distanceLeft = hardwareMap.get(Rev2mDistanceSensor.class, "distanceLeft");
         distanceRight = hardwareMap.get(Rev2mDistanceSensor.class, "distanceRight");
         colorLeft = hardwareMap.get(ColorSensor.class, "colorLeft");
+        touchLeft = hardwareMap.get(RevTouchSensor.class, "touchLeft");
+        touchRight = hardwareMap.get(RevTouchSensor.class, "touchRight");
+
         //servo = hardwareMap.get(CRServo.class, "servo");
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -133,6 +139,9 @@ public class CheeseBot extends LinearOpMode {
             red = colorLeft.red();
             green = colorLeft.green();
             blue = colorLeft.blue();
+
+
+
 
             //all telemetry
             telemetry.addData("Wheel Position", motorFwdLeft.getCurrentPosition()); //to be used when the encoders are ready

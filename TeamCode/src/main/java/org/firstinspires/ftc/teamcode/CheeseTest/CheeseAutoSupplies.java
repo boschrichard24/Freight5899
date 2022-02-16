@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 //import org.openftc.easyopencv.OpenCvInternalCamera;
 
 
-public abstract class AutoSupplies extends LinearOpMode{
+public abstract class CheeseAutoSupplies extends LinearOpMode{
     //  Establish hardware
     protected DcMotor  motorFwdLeft   = null;
     protected DcMotor  motorFwdRight  = null;
