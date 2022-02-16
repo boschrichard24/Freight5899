@@ -163,6 +163,8 @@ public class OverrideTestOp22 extends LinearOpMode{
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
         pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 //  Set the direction for each of the motors  \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
