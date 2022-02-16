@@ -210,7 +210,8 @@ public abstract class AutoSupplies extends LinearOpMode{
                 + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
         
         // "While the robot is running and the average encoder values don't exceed the required encoder target..." \\
-        while (opModeIsActive() && averageEnc <= Math.abs(counts)){
+        // (also, averageEnc is already abs value) \\
+        while (opModeIsActive() && averageEnc < Math.abs(counts)){
             averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
                     + Math.abs(right_Front_Drive.getCurrentPosition())
                     + Math.abs(left_Back_Drive.getCurrentPosition())
