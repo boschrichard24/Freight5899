@@ -29,7 +29,7 @@ public class OverrideTestOp22 extends LinearOpMode{
     private double powerChange          = 1.0;
     protected RevBlinkinLedDriver lights;
     // Claw vars
-    protected CRServo basket            = null;  // This is the open and close servo of the claw \\
+    protected CRServo basket            = null;  // This is the Continuous servo for the intake basket \\
     private double basketPower          = 5.0;
     // Motors vars
     protected DcMotor left_Back_Drive   = null;
@@ -39,7 +39,7 @@ public class OverrideTestOp22 extends LinearOpMode{
     protected DcMotor left_Arm_Motor    = null;
     protected DcMotor right_Arm_Motor   = null;
     protected DcMotor pivot_Arm_Motor   = null;
-    protected DcMotor ducky             = null;
+    protected DcMotor ducky             = null;  // Motor on the back of the robot to spin the carousel wheel \\
     // Button Booleans
     private boolean changed1            = false;
     private boolean changed2            = false;
@@ -324,20 +324,16 @@ public class OverrideTestOp22 extends LinearOpMode{
 */
             setArmLevel(level);
 
-//  C L A W func \\
-            if(gamepad2.a && !gamepad2.b){
+//  I N T A K E func \\
+            if(gamepad2.a && !gamepad2.b) {
                 basket.setPower(basketPower);
             }
-            else if(gamepad2.b && !gamepad2.a){
-                basket.setPower(-1);
+            else if(gamepad2.b && !gamepad2.a) {
+                basket.setPower(-basketPower);
             }
-            else{ basket.setPower(01*basketPower); }
-/*
-            if(gamepad2.right_stick_button && !changedZer0){
-                runArmPower(0.0);
-                changedZer0 = true;
-            }else if(!gamepad2.right_stick_button){changedZer0 = false; }
-*/
+            else {
+                basket.setPower(0.0);
+            }
 
 //  T E M E T R Y  D A T A  \\
             telemetry.addData("  <===============>  ", "");
@@ -345,7 +341,6 @@ public class OverrideTestOp22 extends LinearOpMode{
             telemetry.addData("Current Arm Level: ", level);
             telemetry.addData("Arm Left Encoder Value: ",  left_Arm_Motor.getCurrentPosition());
             telemetry.addData("Arm Right Encoder Value: ",  right_Arm_Motor.getCurrentPosition());
-            //telemetry.addData("Pivot Encoder Value: ",  pivot_Arm_Motor.getCurrentPosition());
 
             telemetry.addData("  ----------  ", "");
 
@@ -353,8 +348,6 @@ public class OverrideTestOp22 extends LinearOpMode{
             telemetry.addData("Button/Input Y is on: ", gamepad2.y);
             telemetry.addData("Button/Input B is on: ", gamepad2.b);
             telemetry.addData("Button/Input A is on: ", gamepad2.a);
-
-            telemetry.addData("  ----------  ", "");
 
             telemetry.addData("  <===============>  ", "");
             telemetry.update();
