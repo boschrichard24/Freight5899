@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -26,7 +26,7 @@ public class SimpleDrive extends LinearOpMode {
     private DcMotor ducky             = null;
     private DcMotor pivot_Arm_Motor   = null;
 
-    Servo claw;
+    CRServo basket;
 
     /* Declare OpMode members. */
     /*
@@ -46,7 +46,7 @@ public class SimpleDrive extends LinearOpMode {
         left_Arm_Motor    = hardwareMap.get(DcMotor.class, "left_Arm_Motor");
         right_Arm_Motor   = hardwareMap.get(DcMotor.class, "right_Arm_Motor");
 
-        claw              = hardwareMap.get(Servo.class, "claw");
+        basket              = hardwareMap.get(CRServo.class, "basket");
         ducky             = hardwareMap.get(DcMotor.class, "ducky");
         pivot_Arm_Motor   = hardwareMap.get(DcMotor.class, "spin");
 
@@ -119,12 +119,12 @@ public class SimpleDrive extends LinearOpMode {
             //Arm code
             double armDriveLeft  = -gamepad2.left_stick_y;
             double armDriveRight = -gamepad2.right_stick_y;
-            armLeftPower  = Range.clip(armDriveLeft, -0.12, 0.12);
-            armRightPower = Range.clip(armDriveRight, -0.12, 0.12);
+            armLeftPower  = Range.clip(armDriveLeft, -0.08, 0.08);
+            armRightPower = Range.clip(armDriveRight, -0.08, 0.08);
 
             //Spin Code
             double spinLeft = gamepad2.left_stick_x;
-            spinPower       = Range.clip(spinLeft, -0.5, 0.5);
+            spinPower       = Range.clip(spinLeft, -0.3, 0.3);
 
             // Send calculated power to wheels
             left_Back_Drive.setPower(leftPower);

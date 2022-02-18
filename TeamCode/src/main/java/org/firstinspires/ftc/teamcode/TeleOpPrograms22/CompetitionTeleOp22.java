@@ -29,7 +29,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
     private int level = 1;
     public RevBlinkinLedDriver lights;
     // Claw vars
-    protected Servo claw        = null;  // This is the open and close servo of the claw \\
+    protected CRServo basket        = null;  // This is the open and close servo of the claw \\
     final private double clawMax       = 0.401;
     final private double clawMin       = 0.601;
     private double clawPos             = 0.0;
@@ -143,7 +143,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
         //claw = hardwareMap.get(Servo.class, "claw");
-        intake_Spinner = hardwareMap.get(CRServo.class, "spinner");
+        intake_Spinner = hardwareMap.get(CRServo.class, "basket");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
 //  Set the direction for each of the DC motors  \\
@@ -263,7 +263,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             prevLevel = level;
         }
     }
-    
+ /*
     void clawFunction()
     {
         if(gamepad2.x && clawPos < clawMax){
@@ -279,7 +279,7 @@ public class CompetitionTeleOp22 extends LinearOpMode {
             claw.setPosition(clawPos);
         }
     }
-    
+ */
     void spinnerIntakeFunction()
     {
         if (gamepad2.right_trigger > 0.1) {

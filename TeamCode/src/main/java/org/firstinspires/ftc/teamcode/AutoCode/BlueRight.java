@@ -49,31 +49,47 @@ public class BlueRight extends AutoSupplies {
         //sleep(300);
         if (path == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            //setArmLevel(1);
         } else if (path == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if (path == 3) {
+            //setArmLevel(3);
+        } else if(path == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-        } else {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        }
+            //setArmLevel(5);
+        } else{ lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED); }
         //clawOpen();
-        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+        //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         encoderMove(250,0.5,0.5);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_PARTY_PALETTE);
-        turnToS(90,0.7,3);
+        turnToS(-90,0.7,3);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
-        encoderMove(1650,1,1);
+        encoderMove(350,1,1);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_OCEAN_PALETTE);
-        turnToS(135,0.5,3);
+        turnToS(180,0.5,3);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);
+        duckyMotorPower('B');
+
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_OCEAN_PALETTE);
+        turnToS(180,0.5,3);
+        pause(1000);
+
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+        encoderMove(900,0.5,0.5);
+        pause(1000);
+
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+        encoderMove(805,0.5,0.5);
+        pause(1000);
+
+
 
 
     }

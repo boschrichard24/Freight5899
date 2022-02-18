@@ -352,7 +352,7 @@ public abstract class AutoSupplies extends LinearOpMode{
                 break;
         }
 
-        runArmPower(.5);
+        runArmPower(.25);
         left_Arm_Motor.setTargetPosition(encoderTargets[0]);
         right_Arm_Motor.setTargetPosition(encoderTargets[1]);
     }
@@ -392,6 +392,44 @@ public abstract class AutoSupplies extends LinearOpMode{
         pivot_Arm_Motor.setPower(power);
     }
 
+
+
+    public void encoderPivotMove(double degrees, double pw){
+        resetPivotEncoders();
+        double counts = degrees * COUNTS_PER_DEGREE1;
+        double spinPower = pw;
+
+        double posPower = 0.2;
+
+        //sets the power of the motors
+        double averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                + Math.abs(right_Front_Drive.getCurrentPosition())
+                + Math.abs(left_Back_Drive.getCurrentPosition())
+                + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+        while (opModeIsActive() && averageEnc <= counts){
+            averageEnc = (Math.abs(left_Front_Drive.getCurrentPosition())
+                    + Math.abs(right_Front_Drive.getCurrentPosition())
+                    + Math.abs(left_Back_Drive.getCurrentPosition())
+                    + Math.abs(right_Back_Drive.getCurrentPosition()))/4.0;
+            if(posPower < 1 && averageEnc/counts < .6){
+                posPower *= 1.1;
+            }
+            else if(posPower >= 1 && averageEnc/counts <.6){
+                posPower = 1;
+            }
+            else if(averageEnc/counts >= .6 && posPower >= .25){
+                posPower *= .99;
+            }
+            else{
+                posPower = .25;
+            }
+            pivot_Arm_Motor.setPower(spinPower*posPower);
+
+        }
+        pivot_Arm_Motor.setPower(0);
+    }
+
+
     public void BasketIn(){
         basket.setPower(5);
     }
@@ -422,12 +460,6 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
-
-    public void setPivotEncoderMode()
-    {
-        pivot_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-
 
 
 
@@ -602,6 +634,9 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        resetArmEncoders();
+        setArmEncoderMode();
 
         //initializes imu and calibrates it. Prepares lift motor to land using the encoder
         // Lights turn green when it is calibrated

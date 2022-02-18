@@ -48,15 +48,18 @@ public class BlueRD extends AutoSupplies{
         //sleep(300);
         if (path == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            setArmLevel(1);
         } else if (path == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            setArmLevel(3);
         } else if(path == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
+            setArmLevel(5);
         } else{ lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED); }
 
         //clawOpen();
 
-        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
+        //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
         encoderMove(250,0.5,0.5);
         pause(1000);
 
@@ -86,6 +89,10 @@ public class BlueRD extends AutoSupplies{
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BEATS_PER_MINUTE_PARTY_PALETTE);
         turnToS(45,0.7,3);
+        pause(1000);
+
+        lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_OCEAN_PALETTE);
+        turnToS(135,0.5,3);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.SINELON_LAVA_PALETTE);

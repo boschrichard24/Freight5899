@@ -48,13 +48,14 @@ public class RedEmergaency extends AutoSupplies {
         //sleep(300);
         if (path == 1) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
+            setArmLevel(1);
         } else if (path == 2) {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-        } else if (path == 3) {
+            setArmLevel(3);
+        } else if(path == 3){
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-        } else {
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-        }
+            setArmLevel(5);
+        } else{ lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED); }
        // clawOpen();
         encoderMove(500, .5, .7);
         turnToS(180, .6, 2);

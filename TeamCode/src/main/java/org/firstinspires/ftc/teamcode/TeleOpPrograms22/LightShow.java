@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TeleOpPrograms22;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,7 +24,7 @@ public class LightShow extends LinearOpMode {
     protected DcMotor ducky             = null;
 
     public RevBlinkinLedDriver lights;
-    protected Servo claw        = null;
+    protected CRServo basket        = null;
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -39,7 +40,7 @@ public class LightShow extends LinearOpMode {
         pivot_Arm_Motor = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
         ducky = hardwareMap.get(DcMotor.class, "ducky");
 
-        claw = hardwareMap.get(Servo.class, "claw");
+        basket = hardwareMap.get(CRServo.class, "basket");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
 
 //  Set the direction for each of the motors  \\
