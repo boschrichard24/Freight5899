@@ -48,7 +48,7 @@ public class SimpleDrive extends LinearOpMode {
 
         basket              = hardwareMap.get(CRServo.class, "basket");
         ducky             = hardwareMap.get(DcMotor.class, "ducky");
-        pivot_Arm_Motor   = hardwareMap.get(DcMotor.class, "spin");
+        pivot_Arm_Motor   = hardwareMap.get(DcMotor.class, "pivot_Arm_Motor");
 
         // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
