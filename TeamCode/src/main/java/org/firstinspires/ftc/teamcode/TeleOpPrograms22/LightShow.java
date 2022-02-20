@@ -76,6 +76,7 @@ public class LightShow extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            ducky.setPower(0.08);
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
             pause(22000);
 
@@ -116,7 +117,7 @@ public class LightShow extends LinearOpMode {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_RAINBOW_PALETTE);
             pause(25000);
 
-            if(runtime.seconds() == 300){
+            if(runtime.seconds() > 280){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE_VIOLET);
                 pause(12000);
             }
@@ -152,7 +153,7 @@ public class LightShow extends LinearOpMode {
             lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_FOREST_PALETTE);
             pause(30000);
 
-            if(runtime.seconds() == 300){
+            if(runtime.seconds() > 280){
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CONFETTI);
                 pause(20000);
             }

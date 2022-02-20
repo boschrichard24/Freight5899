@@ -77,59 +77,42 @@ public class OverrideTestOp22 extends LinearOpMode{
 
         switch (targetLevel) {
             case 1:
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                encoderTargets[0] = -702;
-                //sleep(100);
-                encoderTargets[1] = -885; // floor level to pick up pieces \\
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
+                targetLevel = 7;
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                runArmPower(-0.6); // floor level to pick up pieces \\
+                while(!touchLeft.isPressed() && !touchRight.isPressed() && (left_Arm_Motor.getCurrentPosition() != 0 || right_Arm_Motor.getCurrentPosition() != 0)){
+                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_FOREST_PALETTE);
+                }
                 break;
             case 2:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                encoderTargets[0] = -612;
-                encoderTargets[1] = -829; // level 1 on shipping container \\
+                encoderTargets[0] = 107;
+                encoderTargets[1] = 125; // level 1 on shipping container \\
                 break;
             case 3:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                encoderTargets[0] = -467;
-                encoderTargets[1] = -756; // level 2 on shipping container \\
+                encoderTargets[0] = 768;
+                encoderTargets[1] = 629; // level 2 on shipping container \\
                 break;
             case 4:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                encoderTargets[0] = 6;
-                encoderTargets[1] = -441; // level 3 on shipping container \\
+                encoderTargets[0] = 768;
+                encoderTargets[1] = 629; // level 3 on shipping container \\
                 break;
             case 5:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 12;
-                encoderTargets[1] = -400; // top of shipping container for gamepiece \\
+                encoderTargets[0] = 800;
+                encoderTargets[1] = 680; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = 20;
-                encoderTargets[1] = -389; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 0; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
-                // Override Path :
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_FOREST_PALETTE);
-                encoderTargets[0] = -131;
-                encoderTargets[1] = -695; // level 3 on shipping container \\
-                runArmPower(.5);
-                left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-                right_Arm_Motor.setTargetPosition(encoderTargets[1]);
-                sleep(1000);
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RAINBOW_LAVA_PALETTE);
-                encoderTargets[0] = -131;
-                encoderTargets[1] = 0; // go home \\
-                runArmPower(.5);
-                left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-                right_Arm_Motor.setTargetPosition(encoderTargets[1]);
-                resetArmEncoders();
-                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                level = 5;
-                encoderTargets[0] = -12;
-                encoderTargets[1] = -587;
-                telemetry.addData("Status", "Please Reset TeleOp");
-                telemetry.update();
+                break;
 
 
             default:
@@ -138,9 +121,21 @@ public class OverrideTestOp22 extends LinearOpMode{
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
-            runArmPower(.5);
+        if(targetLevel != 1 || targetLevel != 7){
+            runArmPower(.35);
             left_Arm_Motor.setTargetPosition(encoderTargets[0]);
             right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        }
+        else if(targetLevel == 1 || targetLevel == 7){
+            runArmPower(0);
+            resetArmEncoders();
+            left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+            encoderTargets[0] = 0;
+            encoderTargets[1] = 0;
+            targetLevel = 7;
+        }
 
 
     }
@@ -266,7 +261,7 @@ public class OverrideTestOp22 extends LinearOpMode{
             }
 //  D U C K Y func  \\
             if (gamepad1.right_bumper && !ducky.isBusy()) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_BLUE);
                 long millis = 1100;
                 runtime.reset();
                 while(runtime.milliseconds() <= millis){
@@ -280,7 +275,7 @@ public class OverrideTestOp22 extends LinearOpMode{
                 ducky.setPower(0);
             }
             else if (gamepad1.left_bumper && !ducky.isBusy()) {
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_LIGHT_CHASE);
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
                 long millis = 1100;
                 runtime.reset();
                 while (runtime.milliseconds() <= millis) {
@@ -315,13 +310,7 @@ public class OverrideTestOp22 extends LinearOpMode{
                 level = 6;
                 changed6 = true;
             }else if(!gamepad2.y){changed6 = false;}
-/*
-            //accesses the override
-            if(gamepad2.left_stick_button && !changedOverride){
-                level = 7;
-                changedOverride = true;
-            }else if(!gamepad2.left_stick_button){changedOverride = false; level = 3;}
-*/
+
             setArmLevel(level);
 
 //  I N T A K E func \\
@@ -348,6 +337,9 @@ public class OverrideTestOp22 extends LinearOpMode{
             telemetry.addData("Button/Input Y is on: ", gamepad2.y);
             telemetry.addData("Button/Input B is on: ", gamepad2.b);
             telemetry.addData("Button/Input A is on: ", gamepad2.a);
+            telemetry.addData("TouchLeft: ", touchLeft.isPressed());
+            telemetry.addData("TouchRight: ", touchRight.isPressed());
+
 
             telemetry.addData("  <===============>  ", "");
             telemetry.update();

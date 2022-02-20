@@ -132,6 +132,14 @@ public abstract class AutoSupplies extends LinearOpMode{
         double rightFrontPower = rp;
         double leftBackPower = lp;
         double rightBackPower = rp;
+
+        if(lp < 0 || rp < 0){
+            left_Back_Drive.setDirection(DcMotorSimple.Direction.REVERSE);
+            left_Front_Drive.setDirection(DcMotorSimple.Direction.REVERSE);
+            right_Back_Drive.setDirection(DcMotorSimple.Direction.REVERSE);
+            right_Front_Drive.setDirection(DcMotorSimple.Direction.REVERSE);
+        }
+
         double maxPower;
         double posPower = 0.2;
         maxPower = Math.abs(leftFrontPower);
@@ -181,6 +189,12 @@ public abstract class AutoSupplies extends LinearOpMode{
         left_Back_Drive.setPower(0);
         right_Front_Drive.setPower(0);
         right_Back_Drive.setPower(0);
+
+        left_Back_Drive.setDirection(DcMotorSimple.Direction.FORWARD);
+        left_Front_Drive.setDirection(DcMotorSimple.Direction.FORWARD);
+        right_Back_Drive.setDirection(DcMotorSimple.Direction.FORWARD);
+        right_Front_Drive.setDirection(DcMotorSimple.Direction.FORWARD);
+
     }
     
     public void alternateEncoderMove(double degrees, double lp, double rp){
@@ -312,34 +326,34 @@ public abstract class AutoSupplies extends LinearOpMode{
         switch (targetLevel) {
             case 1:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                encoderTargets[0] = -702;
+                encoderTargets[0] = -681;
                 //sleep(100);
-                encoderTargets[1] = -885; // floor level to pick up pieces \\
+                encoderTargets[1] = -896; // floor level to pick up pieces \\
                 break;
             case 2:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                encoderTargets[0] = -612;
-                encoderTargets[1] = -829; // level 1 on shipping container \\
+                encoderTargets[0] = -587;
+                encoderTargets[1] = -828; // level 1 on shipping container \\
                 break;
             case 3:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                encoderTargets[0] = -467;
-                encoderTargets[1] = -756; // level 2 on shipping container \\
+                encoderTargets[0] = -387;
+                encoderTargets[1] = -668; // level 2 on shipping container \\
                 break;
             case 4:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                encoderTargets[0] = 6;
-                encoderTargets[1] = -441; // level 3 on shipping container \\
+                encoderTargets[0] = 83;
+                encoderTargets[1] = -323; // level 3 on shipping container \\
                 break;
             case 5:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 12;
-                encoderTargets[1] = -400; // top of shipping container for gamepiece \\
+                encoderTargets[0] = 90;
+                encoderTargets[1] = -312; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = 0;
-                encoderTargets[1] = 0; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = -700;
+                encoderTargets[1] = -902; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -427,6 +441,17 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         }
         pivot_Arm_Motor.setPower(0);
+    }
+
+
+
+    public void pivotTimeMove(long millis, double pw) {
+        double spinPower = pw;
+        runtime.reset();
+        while (opModeIsActive() && runtime.milliseconds() <= millis) {
+            pivot_Arm_Motor.setPower(spinPower);
+        }
+        pivot_Arm_Motor.setPower(spinPower);
     }
 
 
