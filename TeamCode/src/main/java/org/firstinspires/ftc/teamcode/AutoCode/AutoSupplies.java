@@ -5,6 +5,7 @@ package org.firstinspires.ftc.teamcode.AutoCode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
+import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -55,7 +56,10 @@ public abstract class AutoSupplies extends LinearOpMode{
     protected RevBlinkinLedDriver lights;
     protected CRServo basket = null;  // This is the open and close servo of the claw \\
     protected DcMotor ducky = null;
-/*
+    protected RevTouchSensor touchLeft  = null;
+    protected RevTouchSensor touchRight = null;
+
+    /*
     protected Rev2mDistanceSensor distanceFwdLeft = null;
     protected Rev2mDistanceSensor distanceFwdRight = null;
     protected Rev2mDistanceSensor distanceBackLeft = null;
@@ -326,9 +330,9 @@ public abstract class AutoSupplies extends LinearOpMode{
         switch (targetLevel) {
             case 1:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
-                encoderTargets[0] = -681;
+                encoderTargets[0] = -698;
                 //sleep(100);
-                encoderTargets[1] = -896; // floor level to pick up pieces \\
+                encoderTargets[1] = -978; // floor level to pick up pieces \\
                 break;
             case 2:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
@@ -342,18 +346,18 @@ public abstract class AutoSupplies extends LinearOpMode{
                 break;
             case 4:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                encoderTargets[0] = 83;
-                encoderTargets[1] = -323; // level 3 on shipping container \\
+                encoderTargets[0] = -297;
+                encoderTargets[1] = -680; // level 3 on shipping container \\
                 break;
             case 5:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 90;
-                encoderTargets[1] = -312; // top of shipping container for gamepiece \\
+                encoderTargets[0] = -45;
+                encoderTargets[1] = -608; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = -700;
-                encoderTargets[1] = -902; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = -28;
+                encoderTargets[1] = -507; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 //lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.VIOLET);
@@ -365,11 +369,18 @@ public abstract class AutoSupplies extends LinearOpMode{
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
-
-        runArmPower(.25);
-        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        if(targetLevel == 4) {
+            runArmPower(1.5);
+            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        }
+        else if(targetLevel != 4){
+            runArmPower(0.08);
+            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        }
     }
+
 
     public void resetDriveEncoders(){
         left_Front_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -451,13 +462,11 @@ public abstract class AutoSupplies extends LinearOpMode{
         while (opModeIsActive() && runtime.milliseconds() <= millis) {
             pivot_Arm_Motor.setPower(spinPower);
         }
-        pivot_Arm_Motor.setPower(spinPower);
+        pivot_Arm_Motor.setPower(0);
     }
 
 
-    public void BasketIn(){
-        basket.setPower(5);
-    }
+    public void BasketIn(){ basket.setPower(5); }
     public void BasketOut(){
         basket.setPower(-5.0);
     }
@@ -639,6 +648,8 @@ public abstract class AutoSupplies extends LinearOpMode{
 
         basket = hardwareMap.get(CRServo.class, "basket");
         lights = hardwareMap.get(RevBlinkinLedDriver.class, "lights");
+        touchLeft = hardwareMap.get(RevTouchSensor.class, "touchLeft");
+        touchRight = hardwareMap.get(RevTouchSensor.class, "touchRight");
 
 // Set the direction for each of the motors \\
         left_Back_Drive.setDirection(DcMotor.Direction.FORWARD);
@@ -656,12 +667,11 @@ public abstract class AutoSupplies extends LinearOpMode{
         right_Back_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         left_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_Front_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //right_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //left_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivot_Arm_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         resetArmEncoders();
-        setArmEncoderMode();
 
         //initializes imu and calibrates it. Prepares lift motor to land using the encoder
         // Lights turn green when it is calibrated

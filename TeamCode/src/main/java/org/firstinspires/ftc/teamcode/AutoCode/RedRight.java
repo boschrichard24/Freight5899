@@ -66,7 +66,7 @@ public class RedRight extends AutoSupplies {
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BREATH_RED);
-        encoderMove(750,1,1);
+        encoderMove(800,1,1);
         pause(1000);
 
         lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.TWINKLES_OCEAN_PALETTE);

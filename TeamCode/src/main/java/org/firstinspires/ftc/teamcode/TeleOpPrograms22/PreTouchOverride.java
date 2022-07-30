@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode.TeleOpPrograms22;
-
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,8 +11,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name="OverrideTestOp22", group="Linear Opmode")
-public class OverrideTestOp22 extends LinearOpMode{
+@TeleOp(name="PreTouchOverride", group="Linear Opmode")
+public class PreTouchOverride extends LinearOpMode{
 
 
     // ******************               VARIABLE DEF-S              ******************  \\
@@ -87,19 +86,20 @@ public class OverrideTestOp22 extends LinearOpMode{
         switch (targetLevel) {
             case 1:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
-                tempLPpower = -gamepad1.left_stick_y*powerChange;
-                temRPpower = -gamepad1.right_stick_y*powerChange;
-                left_Back_Drive.setPower(tempLPpower);
-                right_Back_Drive.setPower(temRPpower);
-                left_Front_Drive.setPower(tempLPpower);
-                right_Front_Drive.setPower(temRPpower);
-                targetLevel = 7;
                 left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                runArmPower(-0.25); // floor level to pick up pieces \\
-                while(!touchLeft.isPressed() && !touchRight.isPressed() && (left_Arm_Motor.getCurrentPosition() != 0 || right_Arm_Motor.getCurrentPosition() != 0)){
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_FOREST_PALETTE);
+                runArmPower(-0.5); // floor level to pick up pieces \\
+                while((!touchLeft.isPressed() && !touchRight.isPressed()) && (left_Arm_Motor.getCurrentPosition() != 0 || right_Arm_Motor.getCurrentPosition() != 0)){
+                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
+                    idle();
                 }
+                runArmPower(0);
+                resetArmEncoders();
+                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.RED);
+                encoderTargets[0] = 0;
+                encoderTargets[1] = 0;
                 break;
             case 2:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
@@ -136,12 +136,12 @@ public class OverrideTestOp22 extends LinearOpMode{
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
-        if(targetLevel != 1 || targetLevel != 7){
-            runArmPower(.42);
+        //if(targetLevel != 1 || targetLevel != 7){
+            runArmPower(.35);
             left_Arm_Motor.setTargetPosition(encoderTargets[0]);
             right_Arm_Motor.setTargetPosition(encoderTargets[1]);
-        }
-        else if(targetLevel == 1 || targetLevel == 7){
+        //}
+       /* else if(targetLevel == 1 || targetLevel == 7){
             runArmPower(0);
             resetArmEncoders();
             left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -151,7 +151,7 @@ public class OverrideTestOp22 extends LinearOpMode{
             encoderTargets[1] = 0;
             targetLevel = 7;
         }
-
+*/
 
     }
 
@@ -376,3 +376,5 @@ public class OverrideTestOp22 extends LinearOpMode{
         }
     }
 }
+
+

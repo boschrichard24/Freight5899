@@ -12,8 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 
-@TeleOp(name="OverrideTestOp22", group="Linear Opmode")
-public class OverrideTestOp22 extends LinearOpMode{
+@TeleOp(name="LevelsTestOp", group="Linear Opmode")
+public class LevelsTeleOp extends LinearOpMode{
 
 
     // ******************               VARIABLE DEF-S              ******************  \\
@@ -50,6 +50,8 @@ public class OverrideTestOp22 extends LinearOpMode{
     private boolean changed7            = false;
     private boolean changed1Zero        = false;
     private boolean changed2Zero        = false;
+    private boolean lower1changed       = false;
+    private boolean lower2changed       = false;
     //Sensor Variables
     protected RevTouchSensor touchLeft  = null;
     protected RevTouchSensor touchRight = null;
@@ -80,51 +82,38 @@ public class OverrideTestOp22 extends LinearOpMode{
     }
 
     public void setArmLevel(int targetLevel) {
-        double tempLPpower;
-        double temRPpower;
         int[] encoderTargets = new int[2];
 
         switch (targetLevel) {
             case 1:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED);
-                tempLPpower = -gamepad1.left_stick_y*powerChange;
-                temRPpower = -gamepad1.right_stick_y*powerChange;
-                left_Back_Drive.setPower(tempLPpower);
-                right_Back_Drive.setPower(temRPpower);
-                left_Front_Drive.setPower(tempLPpower);
-                right_Front_Drive.setPower(temRPpower);
-                targetLevel = 7;
-                left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                runArmPower(-0.25); // floor level to pick up pieces \\
-                while(!touchLeft.isPressed() && !touchRight.isPressed() && (left_Arm_Motor.getCurrentPosition() != 0 || right_Arm_Motor.getCurrentPosition() != 0)){
-                    lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.COLOR_WAVES_FOREST_PALETTE);
-                }
+                encoderTargets[0] = -800;
+                encoderTargets[1] = -950;
                 break;
             case 2:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.ORANGE);
-                encoderTargets[0] = 107;
-                encoderTargets[1] = 125; // level 1 on shipping container \\
+                encoderTargets[0] = -900;
+                encoderTargets[1] = -1000; // level 1 on shipping container \\
                 break;
             case 3:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.YELLOW);
-                encoderTargets[0] = 768;
-                encoderTargets[1] = 629; // level 2 on shipping container \\
+                encoderTargets[0] = -810;
+                encoderTargets[1] = -935; // level 2 on shipping container \\
                 break;
             case 4:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-                encoderTargets[0] = 768;
-                encoderTargets[1] = 629; // level 3 on shipping container \\
+                encoderTargets[0] = -720;
+                encoderTargets[1] = -700; // level 3 on shipping container \\
                 break;
             case 5:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.AQUA);
-                encoderTargets[0] = 800;
-                encoderTargets[1] = 680; // top of shipping container for gamepiece \\
+                encoderTargets[0] = -200;
+                encoderTargets[1] = -600; // top of shipping container for gamepiece \\
                 break;
             case 6:
                 lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLUE);
-                encoderTargets[0] = 0;
-                encoderTargets[1] = 0; // high as possible (Caed.. we need this?? :\ ) \\
+                encoderTargets[0] = 32;
+                encoderTargets[1] = -462; // high as possible (Caed.. we need this?? :\ ) \\
                 break;
             case 7:
                 break;
@@ -136,12 +125,12 @@ public class OverrideTestOp22 extends LinearOpMode{
                 encoderTargets[1] = 0; // Default is bottom (level 1) \\
                 break;
         }
-        if(targetLevel != 1 || targetLevel != 7){
-            runArmPower(.42);
-            left_Arm_Motor.setTargetPosition(encoderTargets[0]);
-            right_Arm_Motor.setTargetPosition(encoderTargets[1]);
-        }
-        else if(targetLevel == 1 || targetLevel == 7){
+        //if(targetLevel != 1 || targetLevel != 7){
+        runArmPower(.35);
+        left_Arm_Motor.setTargetPosition(encoderTargets[0]);
+        right_Arm_Motor.setTargetPosition(encoderTargets[1]);
+        //}
+        /*else if(targetLevel == 1 || targetLevel == 7){
             runArmPower(0);
             resetArmEncoders();
             left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -150,7 +139,7 @@ public class OverrideTestOp22 extends LinearOpMode{
             encoderTargets[0] = 0;
             encoderTargets[1] = 0;
             targetLevel = 7;
-        }
+        }*/
 
 
     }
@@ -314,17 +303,23 @@ public class OverrideTestOp22 extends LinearOpMode{
             if(gamepad2.dpad_down && !changed4){
                 if(level == 7){level = 2;}
                 level --;
-                if(level < 1){level = 1;}
+                if(level < 3){level = 3;}
                 changed4 = true;
             }else if(!gamepad2.dpad_down){changed4 = false;}
             if(gamepad2.x && !changed5){
-                level = 1;
+                level = 3;
                 changed5 = true;
             }else if(!gamepad2.x){changed5 = false;}
             if(gamepad2.y && !changed6){
                 level = 6;
                 changed6 = true;
             }else if(!gamepad2.y){changed6 = false;}
+            if(gamepad2.dpad_left && !lower1changed){
+                level = 2;
+            } else if(!gamepad2.dpad_left) { lower1changed = false; }
+            if(gamepad2.dpad_right && !lower2changed){
+                level = 1;
+            } else if(!gamepad2.dpad_right){ lower2changed = false; }
 
             setArmLevel(level);
 
@@ -333,15 +328,14 @@ public class OverrideTestOp22 extends LinearOpMode{
                 left_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 right_Arm_Motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 runArmPower(0);
-            } else if(!gamepad2.left_stick_button) { changed1Zero = false; }
-            if(gamepad2.right_stick_button && !changed2Zero){
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_BLUE);
+            } else if(!gamepad2.left_stick_button) {
                 resetArmEncoders();
-                pause(1500);
-                lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.LIGHT_CHASE_RED);
+                changed1Zero = false;
                 left_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 right_Arm_Motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            } else if(!gamepad2.right_stick_button){ changed2Zero = false; }
+            }
+
+
 
 //  I N T A K E func \\
             if(gamepad2.a && !gamepad2.b) {
